@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/audit/page": "app/audit/page.js",
+  "/drafts/page": "app/drafts/page.js",
+  "/forms/summer-2026/page": "app/forms/summer-2026/page.js",
+  "/forms/summer-2026/register/page": "app/forms/summer-2026/register/page.js",
+  "/matches/page": "app/matches/page.js",
+  "/matching/page": "app/matching/page.js",
+  "/page": "app/page.js",
+  "/participants/page": "app/participants/page.js",
+  "/sessions/page": "app/sessions/page.js"
+}
