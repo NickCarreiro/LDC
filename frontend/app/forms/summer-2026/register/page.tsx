@@ -1,8 +1,9 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, DollarSign } from "lucide-react";
+import { AlertTriangle, CheckCircle2, DollarSign, FileText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { Modal } from "../../../../components/Modal";
 import { summer2026Form } from "../../../../lib/summer2026Form";
 
 type Values = Record<string, string | string[]>;
@@ -24,14 +25,14 @@ const SECTIONS = [
   {
     id: "commitments",
     title: "Agreements",
-    desc: "Required acknowledgements before your registration can be reviewed.",
+    desc: "Please read each agreement before accepting. All three are required to complete registration.",
     keys: ["date_commitment_ack", "code_of_conduct_ack", "safety_ack", "liability_ack"]
   },
   {
     id: "history",
-    title: "History",
-    desc: "Previous LDC participation and any constraints the organizers need to know.",
-    keys: ["previous_dates", "cannot_date"]
+    title: "History and Vision",
+    desc: "Previous LDC participation, any constraints the organizers need to know, and your vision for marriage.",
+    keys: ["previous_dates", "cannot_date", "vision_statement"]
   }
 ];
 
@@ -42,6 +43,7 @@ export default function RegisterPage() {
   const [photo, setPhoto] = useState<PhotoState>(null);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [agreementOpen, setAgreementOpen] = useState<string | null>(null);
   const firstErrorRef = useRef<HTMLDivElement>(null);
 
   // Revoke object URL on unmount to prevent memory leak
@@ -138,8 +140,38 @@ export default function RegisterPage() {
     );
   }
 
+  const openAgreementField = agreementOpen ? fieldMap[agreementOpen] : null;
+
   return (
     <div className="public-form-page">
+      {openAgreementField?.agreementText && (
+        <Modal
+          eyebrow="Please read carefully"
+          title={openAgreementField.label}
+          onClose={() => setAgreementOpen(null)}
+        >
+          <div style={{ marginTop: 14 }}>
+            <p style={{ whiteSpace: "pre-line", fontSize: 14, lineHeight: 1.7, color: "var(--ink)", maxHeight: 380, overflowY: "auto", padding: "12px 14px", background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              {openAgreementField.agreementText}
+            </p>
+            <div className="confirm-actions" style={{ marginTop: 16 }}>
+              <button type="button" onClick={() => setAgreementOpen(null)}>Close</button>
+              <button
+                className="primary"
+                type="button"
+                onClick={() => {
+                  if (!((values[agreementOpen!] as string[]) ?? []).includes("Yes")) {
+                    toggleOption(agreementOpen!, "Yes");
+                  }
+                  setAgreementOpen(null);
+                }}
+              >
+                <CheckCircle2 size={16} />Accept
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <div className="public-form-container">
         <div className="public-form-header">
           <img src="/brand/little-dates-club-logo-sidebar.png" alt="Little Dates Club" />
@@ -251,9 +283,10 @@ export default function RegisterPage() {
                         <label>
                           {field.label}
                           {field.required && <span>*</span>}
+                          {field.private && <span style={{ marginLeft: 8, fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>(organizer-only)</span>}
                         </label>
                         {field.helpText && <p>{field.helpText}</p>}
-                        <textarea rows={3} value={val as string} onChange={(e) => setVal(key, e.target.value)} />
+                        <textarea rows={field.private ? 5 : 3} value={val as string} onChange={(e) => setVal(key, e.target.value)} />
                       </div>
                     );
                   }
@@ -316,15 +349,26 @@ export default function RegisterPage() {
                   }
 
                   if (field.type === "statement_checkbox") {
+                    const accepted = arrVal.includes("Yes");
                     return (
                       <div className="public-ack" key={key}>
-                        <label>
+                        {field.agreementText && (
+                          <button
+                            type="button"
+                            onClick={() => setAgreementOpen(key)}
+                            style={{ marginBottom: 10, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, padding: "7px 12px" }}
+                          >
+                            <FileText size={15} />
+                            Read {field.label}
+                          </button>
+                        )}
+                        <label style={{ opacity: field.agreementText && !accepted ? 0.55 : 1 }}>
                           <input
                             type="checkbox"
-                            checked={arrVal.includes("Yes")}
+                            checked={accepted}
                             onChange={() => toggleOption(key, "Yes")}
                           />
-                          <span>{field.label}</span>
+                          <span>{field.options?.[0]}</span>
                         </label>
                       </div>
                     );

@@ -237,10 +237,47 @@ const PRIOR_BLOCKED: Participant[] = [
 const GEN_W: Participant[] = Array.from({ length: 112 }, (_, i) => gen(i + 30, "Woman"));
 const GEN_M: Participant[] = Array.from({ length: 112 }, (_, i) => gen(i + 30, "Man"));
 
+// ── Alumni — past sessions only, did not return ───────────────────────────────
+// Winter 2026 alumni: ~26 women + ~26 men who completed but didn't re-enroll
+const ALUMNI_WINTER_W: Participant[] = Array.from({ length: 26 }, (_, i) => ({
+  ...gen(i + 200, "Woman"),
+  sessions: ["Winter 2026"],
+  fee: "paid",
+  status: "Accepted",
+  feedback: i % 4 === 0 ? "Positive experience; did not re-enroll." : "",
+}));
+const ALUMNI_WINTER_M: Participant[] = Array.from({ length: 26 }, (_, i) => ({
+  ...gen(i + 200, "Man"),
+  sessions: ["Winter 2026"],
+  fee: "paid",
+  status: "Accepted",
+  feedback: i % 5 === 0 ? "Positive experience; did not re-enroll." : "",
+}));
+
+// Spring 2026 alumni: ~15 women + ~12 men who completed but didn't continue to Summer
+const ALUMNI_SPRING_W: Participant[] = Array.from({ length: 15 }, (_, i) => ({
+  ...gen(i + 230, "Woman"),
+  sessions: ["Spring 2026"],
+  fee: "paid",
+  status: "Accepted",
+  feedback: "",
+}));
+const ALUMNI_SPRING_M: Participant[] = Array.from({ length: 12 }, (_, i) => ({
+  ...gen(i + 230, "Man"),
+  sessions: ["Spring 2026"],
+  fee: "paid",
+  status: "Accepted",
+  feedback: "",
+}));
+
 export const seedParticipants: Participant[] = [
   ...SIBLINGS,
   ...PRIOR_OK,
   ...PRIOR_BLOCKED,
   ...GEN_W,
   ...GEN_M,
+  ...ALUMNI_WINTER_W,
+  ...ALUMNI_WINTER_M,
+  ...ALUMNI_SPRING_W,
+  ...ALUMNI_SPRING_M,
 ];

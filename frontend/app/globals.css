@@ -1530,3 +1530,316 @@ label textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ── Widget grid system ──────────────────────────────────────────────────── */
+
+.widget-grid-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.widget-edit-banner {
+  margin-top: 8px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: #eef5ff;
+  border: 1px dashed #a8c4e5;
+  color: var(--ldc-blue);
+  font-size: 13px;
+}
+
+.widget-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+  align-items: start;
+}
+
+/* ── Widget frame ──────────────────────────────────────────────────────────── */
+
+.widget-frame {
+  min-width: 0;
+  transition: box-shadow 0.15s, outline 0.12s;
+  position: relative;
+}
+
+.widget-frame--edit {
+  outline: 2px dashed #a8c4e5;
+  outline-offset: 2px;
+}
+
+.widget-frame--dragging {
+  box-shadow: 0 20px 50px rgba(31, 60, 96, 0.22);
+}
+
+.widget-frame--ghost {
+  opacity: 0.9;
+  box-shadow: 0 24px 60px rgba(31, 60, 96, 0.28);
+  pointer-events: none;
+}
+
+.widget-frame-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 8px;
+  margin: -16px -18px 12px;
+  background: #f0f5fb;
+  border-bottom: 1px solid var(--line);
+  border-radius: 7px 7px 0 0;
+}
+
+.widget-drag-handle {
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  padding: 4px 5px;
+  border: none;
+  background: transparent;
+  min-height: auto;
+  border-radius: 6px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.widget-drag-handle:active {
+  cursor: grabbing;
+}
+
+.widget-drag-handle:hover {
+  background: #dde8f4;
+  border: none;
+  box-shadow: none;
+  color: var(--ldc-blue);
+}
+
+.widget-frame-label {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ldc-blue);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-frame-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.widget-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.widget-action-btn:hover {
+  border-color: var(--ldc-blue);
+  color: var(--ldc-blue);
+  box-shadow: none;
+}
+
+.widget-action-btn--remove:hover {
+  border-color: var(--ldc-red);
+  color: var(--ldc-red);
+}
+
+.widget-frame-body {
+  /* no extra padding — panel already has it */
+}
+
+/* ── Customize drawer ──────────────────────────────────────────────────────── */
+
+.customize-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 27, 41, 0.3);
+}
+
+.customize-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  width: min(380px, 90vw);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  box-shadow: -12px 0 50px rgba(31, 60, 96, 0.16);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.customize-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.customize-section {
+  margin-bottom: 18px;
+}
+
+.customize-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.customize-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: var(--surface);
+}
+
+.customize-row--hidden {
+  background: var(--surface-soft);
+  opacity: 0.75;
+}
+
+.customize-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── Widget empty state ─────────────────────────────────────────────────── */
+
+.widget-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.widget-empty-state p {
+  margin: 0;
+}
+
+/* ── Workflow guide widget ──────────────────────────────────────────────── */
+
+.workflow-guide-widget {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.workflow-label {
+  color: var(--ldc-blue);
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.workflow-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.workflow-step-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.workflow-step {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.workflow-arrow {
+  color: var(--line);
+  padding: 0 2px;
+}
+
+/* ── Status strip at half-width ─────────────────────────────────────────── */
+
+@media (min-width: 0px) {
+  .widget-frame [style*="span 1"] .status-strip,
+  .status-strip.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Draft approval inside widget ───────────────────────────────────────── */
+
+.draft-approval-list {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.draft-approval-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 14px;
+}
+
+.draft-approval-item label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ── Responsive: collapse to 1-col on narrow viewport ──────────────────── */
+
+@media (max-width: 1180px) {
+  .widget-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget-frame[style*="span 2"],
+  .widget-frame[style*="span 1"] {
+    grid-column: span 1 !important;
+  }
+}

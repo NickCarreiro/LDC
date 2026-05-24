@@ -11,12 +11,13 @@ import {
   type MatchDraft,
   type Participant,
   type Session,
+  type SessionDisplayName,
 } from "./operationsData";
 import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
-const SCHEMA_VERSION = "v5"; // bump when seed data shape changes to force a reset
+const SCHEMA_VERSION = "v7"; // bump when seed data shape changes to force a reset
 
 function load<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -24,7 +25,7 @@ function load<T>(key: string, fallback: T): T {
     // If schema version doesn't match, clear all stored data and use seed
     const storedVersion = localStorage.getItem("ldc_schema");
     if (storedVersion !== SCHEMA_VERSION) {
-      ["ldc_participants","ldc_sessions","ldc_matchDrafts","ldc_auditEvents","ldc_keywords","ldc_participantEmails","ldc_smtp"].forEach((k) => localStorage.removeItem(k));
+      ["ldc_participants","ldc_sessions","ldc_matchDrafts","ldc_auditEvents","ldc_keywords","ldc_participantEmails","ldc_smtp","ldc_sessionDisplayNames"].forEach((k) => localStorage.removeItem(k));
       localStorage.setItem("ldc_schema", SCHEMA_VERSION);
       return fallback;
     }
@@ -57,6 +58,7 @@ type AddParticipantFields = {
 };
 
 type AddSessionFields = {
+  id: string;       // caller pre-generates so it can track the new session immediately
   name: string;
   window: string;
   deadline: string;
@@ -87,6 +89,9 @@ type Store = {
   updateParticipantEmail: (participantId: string, subject: string, body: string) => void;
   sendApprovedDrafts: () => void;
   addAuditEvent: (e: AuditEvent) => void;
+  sessionDisplayNames: Record<string, SessionDisplayName[]>;
+  generateSessionDisplayNames: (sessionId: string) => void;
+  getDisplayName: (participantId: string, sessionId: string) => string;
 };
 
 const StoreCtx = createContext<Store | null>(null);
@@ -111,6 +116,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [participantEmails, setParticipantEmails] = useState<Record<string, { subject: string; body: string; status: "draft" | "sent" }>>(() =>
     load("ldc_participantEmails", {})
   );
+  const [sessionDisplayNames, setSessionDisplayNames] = useState<Record<string, SessionDisplayName[]>>(() =>
+    load("ldc_sessionDisplayNames", {})
+  );
 
   // Persist to localStorage whenever state changes (skip the very first mount)
   const mounted = useRef(false);
@@ -123,6 +131,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => { if (mounted.current) save("ldc_auditEvents", auditEvents); }, [auditEvents]);
   useEffect(() => { if (mounted.current) save("ldc_keywords", keywords); }, [keywords]);
   useEffect(() => { if (mounted.current) save("ldc_participantEmails", participantEmails); }, [participantEmails]);
+  useEffect(() => { if (mounted.current) save("ldc_sessionDisplayNames", sessionDisplayNames); }, [sessionDisplayNames]);
 
   // ── Logging ──────────────────────────────────────────────────────────────────
   const logEvent = useCallback((action: string, object: string, sensitivity: string) => {
@@ -184,6 +193,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // ── Sessions ─────────────────────────────────────────────────────────────────
   function addSession(fields: AddSessionFields) {
     const newS: Session = {
+      id: fields.id,
       name: fields.name,
       window: fields.window,
       deadline: fields.deadline,
@@ -199,8 +209,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     logEvent("session.create", fields.name, "Low");
   }
 
-  function updateSession(name: string, updates: Partial<Session>) {
-    setSessions((prev) => prev.map((s) => (s.name === name ? { ...s, ...updates } : s)));
+  function updateSession(id: string, updates: Partial<Session>) {
+    setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
   }
 
   // ── Match drafts ─────────────────────────────────────────────────────────────
@@ -265,6 +275,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const emailMap: Record<string, { subject: string; body: string; status: "draft" | "sent" }> = { ...participantEmails };
 
     // Collect all matches per participant
+    // Partners are shown by session display name only (e.g. "Mary 1") for privacy
+    const sessionId = "Summer 2026";
     const matchesForParticipant: Record<string, { id: string; name: string; firstName: string; partners: string[] }> = {};
     for (const draft of approvedDrafts) {
       const pA = draft.participantAId ? participants.find((p) => p.id === draft.participantAId) : participants.find((p) => p.name === draft.pair.split(" + ")[0]);
@@ -272,8 +284,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (!pA || !pB) continue;
       if (!matchesForParticipant[pA.id]) matchesForParticipant[pA.id] = { id: pA.id, name: pA.name, firstName: pA.name.split(" ")[0], partners: [] };
       if (!matchesForParticipant[pB.id]) matchesForParticipant[pB.id] = { id: pB.id, name: pB.name, firstName: pB.name.split(" ")[0], partners: [] };
-      matchesForParticipant[pA.id].partners.push(pB.name);
-      matchesForParticipant[pB.id].partners.push(pA.name);
+      matchesForParticipant[pA.id].partners.push(getDisplayName(pB.id, sessionId));
+      matchesForParticipant[pB.id].partners.push(getDisplayName(pA.id, sessionId));
     }
 
     // Generate one email per participant (don't overwrite manually edited ones)
@@ -322,6 +334,40 @@ export function DataProvider({ children }: { children: ReactNode }) {
     logEvent("email.send_batch", "Approved matches", "Contact information");
   }
 
+  // ── Session display names ─────────────────────────────────────────────────────
+  // Assigns each participant in a session a first-name-only display name.
+  // Participants sharing a first name are numbered (Mary 1, Mary 2).
+  // Keyed by first name; numbering is stable within a session (ordered by participant id).
+  function generateSessionDisplayNames(sessionId: string) {
+    const sessionParticipants = participants.filter((p) => p.sessions.includes(sessionId));
+    const byFirstName: Record<string, Participant[]> = {};
+    for (const p of sessionParticipants) {
+      const first = p.name.split(" ")[0];
+      byFirstName[first] = [...(byFirstName[first] ?? []), p];
+    }
+    const names: SessionDisplayName[] = [];
+    for (const [first, group] of Object.entries(byFirstName)) {
+      const sorted = [...group].sort((a, b) => a.id.localeCompare(b.id));
+      sorted.forEach((p, i) => {
+        names.push({
+          sessionId,
+          participantId: p.id,
+          firstName: first,
+          displayName: sorted.length === 1 ? first : `${first} ${i + 1}`,
+        });
+      });
+    }
+    setSessionDisplayNames((prev) => ({ ...prev, [sessionId]: names }));
+    logEvent("session.display_names.generate", sessionId, "Low");
+  }
+
+  function getDisplayName(participantId: string, sessionId: string): string {
+    const entry = (sessionDisplayNames[sessionId] ?? []).find((n) => n.participantId === participantId);
+    if (entry) return entry.displayName;
+    const p = participants.find((x) => x.id === participantId);
+    return p ? p.name.split(" ")[0] : participantId;
+  }
+
   function addAuditEvent(e: AuditEvent) {
     setAuditEvents((prev) => [e, ...prev]);
   }
@@ -334,6 +380,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         addParticipant, addSession, updateSession, updateParticipant,
         addMatchDraft, removeDraft, updateDraftStatus, updateDraftEmail,
         participantEmails, generateEmailDrafts, updateParticipantEmail, sendApprovedDrafts, addAuditEvent,
+        sessionDisplayNames, generateSessionDisplayNames, getDisplayName,
       }}
     >
       {children}

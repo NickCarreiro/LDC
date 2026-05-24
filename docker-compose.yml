@@ -26,11 +26,5 @@ services:
     volumes:
       - ./infra/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
 
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-
 volumes:
   postgres_data:

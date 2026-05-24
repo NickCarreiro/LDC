@@ -11,7 +11,17 @@ import {
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+
+function clog(message: string) {
+  fetch("/api/log", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ level: "APP", message }),
+  }).catch(() => {});
+}
+
+const PASS = "ldc2026";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: ClipboardList },
@@ -24,10 +34,7 @@ const navItems = [
   { href: "/audit", label: "Audit", icon: LockKeyhole }
 ];
 
-const PASS = "ldc2026";
-
 function getInitialAuth() {
-  // Lazy initializer runs synchronously on client — no hydration flicker
   if (typeof window === "undefined") return false;
   return sessionStorage.getItem("ldc_auth") === "1";
 }
@@ -37,13 +44,20 @@ export function AppShell({ active, children, isPublic = false }: { active: strin
   const [pw, setPw] = useState("");
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    clog("AppShell mounted — authed=" + authed + " isPublic=" + isPublic);
+  }, []);
+
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    clog("handleLogin fired — pw.length=" + pw.length);
     if (pw === PASS) {
+      clog("password correct — setting authed");
       sessionStorage.setItem("ldc_auth", "1");
       setAuthed(true);
       setError(false);
     } else {
+      clog("password wrong");
       setError(true);
       setPw("");
     }

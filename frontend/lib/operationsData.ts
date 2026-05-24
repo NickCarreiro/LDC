@@ -20,9 +20,20 @@ export interface Participant {
   cannotDate: string[];
   feedback: string;
   predictedMatches: string[];
+  orientationDate?: string;
+  welcomeEmailSent?: boolean;
+}
+
+// Maps a participant's global UUID to their session-scoped display name (e.g. "Mary 1")
+export interface SessionDisplayName {
+  sessionId: string;
+  participantId: string;
+  firstName: string;
+  displayName: string;
 }
 
 export interface Session {
+  id: string;       // stable UUID — never changes even if name is edited
   name: string;
   window: string;
   deadline: string;
@@ -61,6 +72,7 @@ export const participants: Participant[] = seedParticipants;
 
 export const sessions: Session[] = [
   {
+    id: "a3d5e7f9-1b2c-4d3e-8f5a-9b0c1d2e3f4a",
     name: "Summer 2026",
     window: "Jun 3 - Aug 14",
     deadline: "May 22",
@@ -73,6 +85,7 @@ export const sessions: Session[] = [
     notes: "Registration open. New participants need orientation before Jun 3."
   },
   {
+    id: "b4e6f8a0-2c3d-4e5f-9a6b-ac1d2e3f4a5b",
     name: "Spring 2026",
     window: "Mar 5 - May 9",
     deadline: "Feb 22",
@@ -85,6 +98,7 @@ export const sessions: Session[] = [
     notes: "Higher repeat women percentage; review negative feedback before invites."
   },
   {
+    id: "c5f7a9b1-3d4e-4f6a-ab7c-bd2e3f4a5b6c",
     name: "Winter 2026",
     window: "Jan 7 - Mar 7",
     deadline: "Dec 20",

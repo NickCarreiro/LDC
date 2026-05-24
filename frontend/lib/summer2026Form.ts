@@ -7,6 +7,7 @@ export type IntakeField = {
   helpText?: string;
   options?: string[];
   private?: boolean;
+  agreementText?: string;
 };
 
 const ages = Array.from({ length: 18 }, (_, index) => String(index + 18));
@@ -135,10 +136,25 @@ export const summer2026Form = {
     {
       key: "code_of_conduct_ack",
       number: 13,
-      label: "Code of Conduct Statement",
+      label: "Code of Conduct",
       type: "statement_checkbox",
       required: true,
-      options: ["Yes, I have read and agree with the Code of Conduct Statement"]
+      options: ["I have read and agree to the Code of Conduct"],
+      agreementText: `Little Dates Club Code of Conduct
+
+As a participant in Little Dates Club, I commit to treating every person I interact with — fellow participants, organizers, and volunteers — with respect, dignity, and kindness.
+
+I will:
+• Honor my date commitments. Once a date is assigned, I will make a good-faith effort to follow through. If I need to cancel, I will notify the organizing team promptly.
+• Communicate honestly and courteously with the organizing team and with my dates.
+• Attend the mandatory orientation if I am a new participant.
+
+I will not:
+• Harass, pressure, belittle, or speak disparagingly about any participant or organizer, whether in person or online.
+• Share another participant's personal information (name, contact details, photo) outside the context of the club.
+• Pursue romantic contact with someone who has indicated they are not interested.
+
+I understand that violations of this Code of Conduct may result in removal from the current session and future sessions at the sole discretion of the organizing team.`
     },
     {
       key: "safety_ack",
@@ -146,15 +162,38 @@ export const summer2026Form = {
       label: "Safety Statement",
       type: "statement_checkbox",
       required: true,
-      options: ["Yes, I have read and agree with the Safety Statement"]
+      options: ["I have read and agree to the Safety Statement"],
+      agreementText: `Little Dates Club Safety Statement
+
+Little Dates Club is a volunteer-run social coordination service. We do not conduct background checks, criminal-history screenings, or identity verification on any participant. You are responsible for your own personal safety.
+
+By participating, I acknowledge and agree to the following:
+
+• I will meet my assigned date for the first time in a public place (e.g., a coffee shop, restaurant, or park).
+• Before meeting someone new, I will inform a trusted friend or family member of where I am going, who I am meeting, and when I expect to return.
+• I will trust my instincts. If I feel unsafe at any point, I will remove myself from the situation.
+• I will report any safety concerns — including threatening messages or inappropriate behavior — to the organizing team as soon as possible.
+
+I understand that Little Dates Club cannot guarantee the character or conduct of other participants, and I take personal responsibility for decisions I make while participating in the program.`
     },
     {
       key: "liability_ack",
       number: 15,
-      label: "Liability Statement",
+      label: "Liability Waiver",
       type: "statement_checkbox",
       required: true,
-      options: ["Yes, I have read and agree with the Liability Statement"]
+      options: ["I have read and agree to the Liability Waiver"],
+      agreementText: `Little Dates Club Liability Waiver
+
+By signing up for Little Dates Club, I voluntarily agree to the following:
+
+Release of Liability: I release and forever discharge Little Dates Club, its organizing team, volunteers, and affiliates from any and all claims, demands, damages, losses, costs, or liabilities of any kind — whether known or unknown — arising from or in connection with my participation in the club, including but not limited to: interactions with other participants, dates arranged through the club, attendance at club events or orientations, and the use of any personal information I provide.
+
+Assumption of Risk: I understand that meeting new people carries inherent social and personal risks, and I voluntarily assume those risks.
+
+Indemnification: I agree to indemnify and hold harmless Little Dates Club and its organizing team from any claim brought by a third party arising from my conduct as a participant.
+
+This waiver does not limit my ability to report safety concerns to the organizing team or to appropriate authorities.`
     },
     {
       key: "previous_dates",
@@ -175,11 +214,11 @@ export const summer2026Form = {
     {
       key: "vision_statement",
       number: 18,
-      label: "VISION",
+      label: "Your Vision",
       type: "long_text",
       required: false,
       private: true,
-      helpText: "Organizer-only vision for relationships and marriage."
+      helpText: "Describe the kind of relationship and marriage you're hoping for. What qualities of character matter most to you in a future spouse? This response is seen by the organizing team only and helps us curate thoughtful matches for you."
     }
   ] satisfies IntakeField[]
 };

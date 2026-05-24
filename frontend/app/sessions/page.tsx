@@ -24,18 +24,18 @@ function pct(num: number, denom: number) {
 
 export default function SessionsPage() {
   const { sessions, addSession, updateSession } = useStore();
-  const [currentName, setCurrentName] = useState(sessions[0]?.name ?? "");
-  const current = sessions.find((s) => s.name === currentName) ?? sessions[0];
+  const [currentId, setCurrentId] = useState(sessions[0]?.id ?? "");
+  const current = sessions.find((s) => s.id === currentId) ?? sessions[0];
 
   const [showNew, setShowNew] = useState(false);
   const [showWorkflow, setShowWorkflow] = useState(false);
   const [sessionAdded, setSessionAdded] = useState(false);
 
-  const [form, setForm] = useState({ name: "", window: "", deadline: "", men: "", women: "", notes: "" });
+  const [form, setForm] = useState({ name: "", window: "", deadline: "", men: "", women: "", notes: "", _id: "" });
   const [formError, setFormError] = useState("");
 
   function openNew() {
-    setForm({ name: "", window: "", deadline: "", men: "", women: "", notes: "" });
+    setForm({ name: "", window: "", deadline: "", men: "", women: "", notes: "", _id: crypto.randomUUID() });
     setFormError("");
     setSessionAdded(false);
     setShowNew(true);
@@ -46,6 +46,7 @@ export default function SessionsPage() {
     if (!form.window.trim()) { setFormError("Date window is required."); return; }
     setFormError("");
     addSession({
+      id: form._id,
       name: form.name.trim(),
       window: form.window.trim(),
       deadline: form.deadline.trim() || "TBD",
@@ -53,13 +54,13 @@ export default function SessionsPage() {
       women: parseInt(form.women) || 0,
       notes: form.notes.trim()
     });
-    setCurrentName(form.name.trim());
+    setCurrentId(form._id);
     setSessionAdded(true);
   }
 
   function toggleStatus(session: typeof sessions[0]) {
     const next = session.status === "Completed" ? "Registration open" : "Completed";
-    updateSession(session.name, { status: next });
+    updateSession(session.id, { status: next });
   }
 
   return (
@@ -90,7 +91,7 @@ export default function SessionsPage() {
               </p>
               <div className="confirm-actions">
                 <button onClick={() => setShowNew(false)} type="button">Close</button>
-                <button className="primary" onClick={() => { setSessionAdded(false); setForm({ name: "", window: "", deadline: "", men: "", women: "", notes: "" }); }} type="button">
+                <button className="primary" onClick={() => { setSessionAdded(false); setForm({ name: "", window: "", deadline: "", men: "", women: "", notes: "", _id: crypto.randomUUID() }); }} type="button">
                   Create Another
                 </button>
               </div>
@@ -154,11 +155,11 @@ export default function SessionsPage() {
             <span>Active session ▾</span>
             <strong style={{ fontSize: 15 }}>
               <select
-                value={currentName}
-                onChange={(e) => setCurrentName(e.target.value)}
+                value={currentId}
+                onChange={(e) => setCurrentId(e.target.value)}
                 style={{ background: "none", border: "1px solid var(--line)", borderRadius: 6, color: "var(--ldc-blue)", fontWeight: 900, fontSize: 15, padding: "2px 4px", width: "100%" }}
               >
-                {sessions.map((s, i) => <option key={`${s.name}-${i}`} value={s.name}>{s.name}</option>)}
+                {sessions.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </strong>
             <small>{current.window}</small>
@@ -199,8 +200,8 @@ export default function SessionsPage() {
               <span>Size and balance</span>
               <span>Status</span>
             </div>
-            {sessions.map((session, i) => (
-              <div className="data-row" key={`${session.name}-${i}`}>
+            {sessions.map((session) => (
+              <div className="data-row" key={session.id}>
                 <span>
                   <strong>{session.name}</strong>
                   <small>Deadline: {session.deadline}</small>

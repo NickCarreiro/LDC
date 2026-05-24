@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Download, Edit2, Eye, FileText, Mail, Search, UsersRound, X } from "lucide-react";
+import { AlertTriangle, ArrowUpDown, CalendarCheck, CheckCircle2, Clipboard, Download, Edit2, Eye, FileText, Mail, Search, UsersRound, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -21,14 +21,32 @@ export default function ParticipantsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [showSensitive, setShowSensitive] = useState(false);
   const [sensitiveShown, setSensitiveShown] = useState(false);
+  const [sortMode, setSortMode] = useState<"name" | "gender-age">("gender-age");
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
-  const filtered = participants.filter((p) => {
-    const textMatch = !filter.trim() ||
-      p.name.toLowerCase().includes(filter.toLowerCase()) ||
-      p.location.toLowerCase().includes(filter.toLowerCase());
-    const statusMatch = !statusFilter || p.status === statusFilter;
-    return textMatch && statusMatch;
-  });
+  const filtered = participants
+    .filter((p) => {
+      const textMatch = !filter.trim() ||
+        p.name.toLowerCase().includes(filter.toLowerCase()) ||
+        p.location.toLowerCase().includes(filter.toLowerCase());
+      const statusMatch = !statusFilter || p.status === statusFilter;
+      return textMatch && statusMatch;
+    })
+    .sort((a, b) => {
+      if (sortMode === "gender-age") {
+        if (a.gender !== b.gender) return a.gender === "Woman" ? -1 : 1;
+        return a.age - b.age;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+  function copyEmails() {
+    const emails = filtered.map((p) => p.email).filter(Boolean).join("\n");
+    navigator.clipboard.writeText(emails).then(() => {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    });
+  }
 
   const selected = participants.find((p) => p.id === selectedId) ?? participants[0];
 
@@ -49,6 +67,8 @@ export default function ParticipantsPage() {
       cannotDate: selected.cannotDate.join(", "),
       special: selected.special ? "true" : "false",
       feedback: selected.feedback ?? "",
+      orientationDate: selected.orientationDate ?? "",
+      welcomeEmailSent: selected.welcomeEmailSent ? "true" : "false",
     });
     setEditing(true);
   }
@@ -73,6 +93,8 @@ export default function ParticipantsPage() {
       cannotDate: editForm.cannotDate.split(",").map((s) => s.trim()).filter(Boolean),
       special: editForm.special === "true",
       feedback: editForm.feedback,
+      orientationDate: editForm.orientationDate || undefined,
+      welcomeEmailSent: editForm.welcomeEmailSent === "true",
     });
     setEditing(false);
   }
@@ -155,6 +177,12 @@ export default function ParticipantsPage() {
           >
             <Search size={18} />Search
           </ActionButton>
+          <button onClick={copyEmails} title="Copy all visible emails to clipboard" type="button">
+            {copyFeedback ? <><CheckCircle2 size={18} />Copied!</> : <><Clipboard size={18} />Copy Emails</>}
+          </button>
+          <button onClick={() => setSortMode((m) => m === "name" ? "gender-age" : "name")} title="Toggle sort order" type="button">
+            <ArrowUpDown size={18} />{sortMode === "gender-age" ? "Gender → Age" : "Name A–Z"}
+          </button>
           <ActionButton action="Participants CSV export" csvData={participantCsv} filename="ldc-participants.csv" kind="download">
             <Download size={18} />Export CSV
           </ActionButton>
@@ -289,8 +317,20 @@ export default function ParticipantsPage() {
                   {participant.desiredDates} dates · ages {participant.ageRange}
                   <small>{participant.interests.slice(0, 3).join(", ")}</small>
                 </span>
-                <span className={participant.special ? "status-pill warning" : "status-pill"}>
-                  {participant.special ? "Organizer review" : participant.status}
+                <span style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-start" }}>
+                  <span className={participant.special ? "status-pill warning" : "status-pill"}>
+                    {participant.special ? "Organizer review" : participant.status}
+                  </span>
+                  <span style={{ display: "flex", gap: 6, fontSize: 11, color: "var(--muted)" }}>
+                    <span title="Orientation">
+                      <CalendarCheck size={12} style={{ verticalAlign: "middle", marginRight: 2 }} />
+                      {participant.orientationDate ?? "—"}
+                    </span>
+                    <span title="Welcome email">
+                      <Mail size={12} style={{ verticalAlign: "middle", marginRight: 2 }} />
+                      {participant.welcomeEmailSent ? "Sent" : "—"}
+                    </span>
+                  </span>
                 </span>
               </div>
             ))}
@@ -360,6 +400,19 @@ export default function ParticipantsPage() {
                   </select>
                 </label>
                 <label>Organizer notes<textarea rows={3} value={editForm.feedback} onChange={(e) => setEditForm((f) => ({ ...f, feedback: e.target.value }))} /></label>
+                <label>Orientation date
+                  <input
+                    placeholder="e.g. May 17"
+                    value={editForm.orientationDate}
+                    onChange={(e) => setEditForm((f) => ({ ...f, orientationDate: e.target.value }))}
+                  />
+                </label>
+                <label>Welcome email sent
+                  <select value={editForm.welcomeEmailSent} onChange={(e) => setEditForm((f) => ({ ...f, welcomeEmailSent: e.target.value }))}>
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </label>
                 <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>Email, age, interests, and vision are read-only.</p>
               </div>
             ) : (() => {
@@ -377,6 +430,8 @@ export default function ParticipantsPage() {
                     <span><strong>Sessions</strong>{selected.sessions.join(", ")}</span>
                     <span><strong>Wants</strong>{selected.desiredDates} dates · ages {selected.ageRange}</span>
                     {selected.cannotDate.length > 0 && <span><strong>Cannot-date</strong>{selected.cannotDate.join(", ")}</span>}
+                    <span><strong>Orientation</strong>{selected.orientationDate ?? "Not recorded"}</span>
+                    <span><strong>Welcome email</strong>{selected.welcomeEmailSent ? "Sent" : "Not sent"}</span>
                   </div>
 
                   {/* Current match drafts */}
