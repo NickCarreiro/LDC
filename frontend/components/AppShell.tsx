@@ -21,8 +21,6 @@ function clog(message: string) {
   }).catch(() => {});
 }
 
-const PASS = "ldc2026";
-
 const navItems = [
   { href: "/", label: "Dashboard", icon: ClipboardList },
   { href: "/forms/summer-2026", label: "Intake Forms", icon: FileText },
@@ -34,33 +32,71 @@ const navItems = [
   { href: "/audit", label: "Audit", icon: LockKeyhole }
 ];
 
-function getInitialAuth() {
+// sessionStorage is used only as a UI hint to avoid a flash of the login form
+// on page load. The real auth check is the server-side cookie via /api/auth/verify.
+function getStoredHint() {
   if (typeof window === "undefined") return false;
   return sessionStorage.getItem("ldc_auth") === "1";
 }
 
 export function AppShell({ active, children, isPublic = false }: { active: string; children: ReactNode; isPublic?: boolean }) {
-  const [authed, setAuthed] = useState(getInitialAuth);
+  const [authed, setAuthed] = useState(getStoredHint);
   const [pw, setPw] = useState("");
   const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
+  // On mount, verify the session cookie server-side. If the sessionStorage hint
+  // was forged (or the cookie expired), this resets the auth state correctly.
   useEffect(() => {
-    clog("AppShell mounted — authed=" + authed + " isPublic=" + isPublic);
-  }, []);
+    if (isPublic) return;
+    fetch("/api/auth/verify")
+      .then((r) => {
+        if (r.ok) {
+          sessionStorage.setItem("ldc_auth", "1");
+          setAuthed(true);
+        } else {
+          sessionStorage.removeItem("ldc_auth");
+          setAuthed(false);
+        }
+      })
+      .catch(() => { /* network error — keep current hint state */ });
+  }, [isPublic]);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    clog("handleLogin fired — pw.length=" + pw.length);
-    if (pw === PASS) {
-      clog("password correct — setting authed");
-      sessionStorage.setItem("ldc_auth", "1");
-      setAuthed(true);
-      setError(false);
-    } else {
-      clog("password wrong");
+    if (submitting) return;
+    setSubmitting(true);
+    setError(false);
+    clog("login attempt");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem("ldc_auth", "1");
+        setAuthed(true);
+        setPw("");
+        clog("login success");
+      } else {
+        setError(true);
+        setPw("");
+        clog("login failed");
+      }
+    } catch {
       setError(true);
       setPw("");
+    } finally {
+      setSubmitting(false);
     }
+  }
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    sessionStorage.removeItem("ldc_auth");
+    setAuthed(false);
+    setPw("");
   }
 
   if (!isPublic && !authed) {
@@ -79,11 +115,12 @@ export function AppShell({ active, children, isPublic = false }: { active: strin
                 value={pw}
                 onChange={(e) => { setPw(e.target.value); setError(false); }}
                 placeholder="Enter password"
+                disabled={submitting}
               />
             </label>
             {error && <p className="login-error">Incorrect password.</p>}
-            <button className="primary" style={{ width: "100%", marginTop: 14 }} type="submit">
-              Sign in
+            <button className="primary" style={{ width: "100%", marginTop: 14 }} type="submit" disabled={submitting}>
+              {submitting ? "Signing in…" : "Sign in"}
             </button>
           </form>
         </div>
@@ -111,7 +148,7 @@ export function AppShell({ active, children, isPublic = false }: { active: strin
         {!isPublic && authed && (
           <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.12)" }}>
             <button
-              onClick={() => { sessionStorage.removeItem("ldc_auth"); setAuthed(false); setPw(""); }}
+              onClick={handleLogout}
               style={{ width: "100%", background: "transparent", border: "1px solid rgba(255,255,255,0.18)", color: "#c8d8ec", fontSize: 13 }}
               type="button"
             >
