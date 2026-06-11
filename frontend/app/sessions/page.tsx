@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, CheckCircle2, ClipboardCheck, FileText, Settings, UserCheck, UsersRound } from "lucide-react";
+import { CalendarDays, CheckCircle2, ClipboardCheck, FileText, Settings, Tag, UserCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -23,13 +23,14 @@ function pct(num: number, denom: number) {
 }
 
 export default function SessionsPage() {
-  const { sessions, addSession, updateSession } = useStore();
+  const { sessions, addSession, updateSession, generateSessionDisplayNames, sessionDisplayNames, participants } = useStore();
   const [currentId, setCurrentId] = useState(sessions[0]?.id ?? "");
   const current = sessions.find((s) => s.id === currentId) ?? sessions[0];
 
   const [showNew, setShowNew] = useState(false);
   const [showWorkflow, setShowWorkflow] = useState(false);
   const [sessionAdded, setSessionAdded] = useState(false);
+  const [showDisplayNames, setShowDisplayNames] = useState(false);
 
   const [form, setForm] = useState({ name: "", window: "", deadline: "", men: "", women: "", notes: "", _id: "" });
   const [formError, setFormError] = useState("");
@@ -63,6 +64,12 @@ export default function SessionsPage() {
     updateSession(session.id, { status: next });
   }
 
+  function openDisplayNames() {
+    if (!current) return;
+    generateSessionDisplayNames(current.id);
+    setShowDisplayNames(true);
+  }
+
   return (
     <AppShell active="/sessions">
       <header className="page-header">
@@ -75,6 +82,11 @@ export default function SessionsPage() {
         </div>
         <div className="toolbar">
           <Link className="button-link" href="/forms/summer-2026"><FileText size={18} />Edit Intake</Link>
+          {current && (
+            <button onClick={openDisplayNames} type="button">
+              <Tag size={18} />Generate Display Names
+            </button>
+          )}
           <button className="primary" onClick={openNew} type="button">
             <CalendarDays size={18} />New Session
           </button>
@@ -148,6 +160,65 @@ export default function SessionsPage() {
           </div>
         </Modal>
       )}
+
+      {showDisplayNames && current && (() => {
+        const names = sessionDisplayNames[current.id] ?? [];
+        const menNames = names.filter((n) => {
+          const p = participants.find((x) => x.id === n.participantId);
+          return p?.gender === "M";
+        });
+        const womenNames = names.filter((n) => {
+          const p = participants.find((x) => x.id === n.participantId);
+          return p?.gender === "F";
+        });
+        const duplicated = names.filter((n) => n.displayName !== n.firstName);
+        return (
+          <Modal
+            eyebrow={current.name}
+            title="Session Display Names"
+            onClose={() => setShowDisplayNames(false)}
+            size="lg"
+          >
+            <p style={{ marginTop: 10, fontSize: 13, color: "var(--muted)" }}>
+              {names.length} participants · {menNames.length}m / {womenNames.length}f ·{" "}
+              {duplicated.length > 0
+                ? `${duplicated.length} numbered (shared first name)`
+                : "no duplicated first names"}
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px", marginTop: 16 }}>
+              <div>
+                <p className="eyebrow" style={{ marginBottom: 8 }}>Men ({menNames.length})</p>
+                <div className="role-list" style={{ maxHeight: 320, overflowY: "auto" }}>
+                  {menNames.map((n) => (
+                    <div className="role-item" key={n.participantId}>
+                      <strong style={{ color: n.displayName !== n.firstName ? "var(--ldc-blue)" : undefined }}>
+                        {n.displayName}
+                      </strong>
+                      {n.displayName !== n.firstName && <span style={{ fontSize: 11 }}>shared first name</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="eyebrow" style={{ marginBottom: 8 }}>Women ({womenNames.length})</p>
+                <div className="role-list" style={{ maxHeight: 320, overflowY: "auto" }}>
+                  {womenNames.map((n) => (
+                    <div className="role-item" key={n.participantId}>
+                      <strong style={{ color: n.displayName !== n.firstName ? "var(--ldc-blue)" : undefined }}>
+                        {n.displayName}
+                      </strong>
+                      {n.displayName !== n.firstName && <span style={{ fontSize: 11 }}>shared first name</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="confirm-actions">
+              <button onClick={() => setShowDisplayNames(false)} type="button">Close</button>
+            </div>
+          </Modal>
+        );
+      })()}
 
       {current && (
         <section className="status-strip">

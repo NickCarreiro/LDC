@@ -270,6 +270,19 @@ const ALUMNI_SPRING_M: Participant[] = Array.from({ length: 12 }, (_, i) => ({
   feedback: "",
 }));
 
+// ── Display-name collision fixtures ──────────────────────────────────────────
+// Three Johns and three Marys in Summer 2026 to exercise the "John 1 / John 2 /
+// John 3" deduplication logic in generateSessionDisplayNames.
+// Last names are drawn from pools that never appear elsewhere in the dataset.
+const DISPLAY_NAME_TEST: Participant[] = [
+  { ...gen(300, "Man"),   id: "dn-m01", name: "John Ashford",   initials: "JA", gender: "Man",   sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+  { ...gen(301, "Man"),   id: "dn-m02", name: "John Beaumont",  initials: "JB", gender: "Man",   sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+  { ...gen(302, "Man"),   id: "dn-m03", name: "John Carrington",initials: "JC", gender: "Man",   sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+  { ...gen(300, "Woman"), id: "dn-w01", name: "Mary Ashford",   initials: "MA", gender: "Woman", sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+  { ...gen(301, "Woman"), id: "dn-w02", name: "Mary Beaumont",  initials: "MB", gender: "Woman", sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+  { ...gen(302, "Woman"), id: "dn-w03", name: "Mary Carrington",initials: "MC", gender: "Woman", sessions: ["Summer 2026"], fee: "paid", status: "Accepted", feedback: "" },
+];
+
 export const seedParticipants: Participant[] = [
   ...SIBLINGS,
   ...PRIOR_OK,
@@ -280,4 +293,5 @@ export const seedParticipants: Participant[] = [
   ...ALUMNI_WINTER_M,
   ...ALUMNI_SPRING_W,
   ...ALUMNI_SPRING_M,
+  ...DISPLAY_NAME_TEST,
 ];

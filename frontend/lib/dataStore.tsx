@@ -17,7 +17,7 @@ import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
-const SCHEMA_VERSION = "v7"; // bump when seed data shape changes to force a reset
+const SCHEMA_VERSION = "v8"; // bump when seed data shape changes to force a reset
 
 function load<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -83,6 +83,7 @@ type Store = {
   addMatchDraft: (draft: MatchDraft) => void;
   removeDraft: (pair: string) => void;
   updateDraftStatus: (pair: string, status: string, email?: string) => void;
+  bulkApproveDrafts: (pairs: string[]) => void;
   updateDraftEmail: (pair: string, subject: string, body: string) => void;
   participantEmails: Record<string, { subject: string; body: string; status: "draft" | "sent" }>;
   generateEmailDrafts: () => void;
@@ -258,6 +259,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     logEvent("match.draft.update", pair, "Matching data");
   }
 
+  function bulkApproveDrafts(pairs: string[]) {
+    if (pairs.length === 0) return;
+    const pairSet = new Set(pairs);
+    setMatchDrafts((prev) =>
+      prev.map((d) => (pairSet.has(d.pair) && d.status !== "Sent" ? { ...d, status: "Approved" } : d))
+    );
+    logEvent("match.draft.bulk_approve", `${pairs.length} pairs`, "Matching data");
+  }
+
   function updateDraftEmail(pair: string, subject: string, body: string) {
     setMatchDrafts((prev) =>
       prev.map((d) => (d.pair === pair ? { ...d, emailSubject: subject, emailBody: body } : d))
@@ -378,7 +388,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         participants, sessions, matchDrafts, auditEvents,
         keywords, addKeyword, updateKeyword, removeKeyword,
         addParticipant, addSession, updateSession, updateParticipant,
-        addMatchDraft, removeDraft, updateDraftStatus, updateDraftEmail,
+        addMatchDraft, removeDraft, updateDraftStatus, bulkApproveDrafts, updateDraftEmail,
         participantEmails, generateEmailDrafts, updateParticipantEmail, sendApprovedDrafts, addAuditEvent,
         sessionDisplayNames, generateSessionDisplayNames, getDisplayName,
       }}

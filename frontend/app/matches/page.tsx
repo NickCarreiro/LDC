@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronDown, ChevronRight, HeartHandshake, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, HeartHandshake, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "../../components/AppShell";
+import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
 import { describeConflicts, scoreParticipants } from "../../lib/operationsData";
 
@@ -16,7 +17,7 @@ function scoreCircleClass(score: number) {
 }
 
 export default function MatchesPage() {
-  const { matchDrafts, participants, removeDraft, updateDraftStatus, keywords } = useStore();
+  const { matchDrafts, participants, removeDraft, updateDraftStatus, bulkApproveDrafts, keywords } = useStore();
 
   // Draft matches table state
   const [draftSearch, setDraftSearch] = useState("");
@@ -24,6 +25,10 @@ export default function MatchesPage() {
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortAsc, setSortAsc] = useState(false);
   const [expandedPair, setExpandedPair] = useState<string | null>(null);
+
+  // Mass approve state
+  const [showApproveAll, setShowApproveAll] = useState(false);
+  const [approveAllDone, setApproveAllDone] = useState(false);
 
   // Date history table state
   const [historySearch, setHistorySearch] = useState("");
@@ -49,6 +54,11 @@ export default function MatchesPage() {
     });
     return list;
   }, [matchDrafts, draftStatus, draftSearch, sortKey, sortAsc]);
+
+  // Pairs visible in the current filtered view that can still be approved
+  const approvablePairs = filteredDrafts
+    .filter((d) => d.status !== "Approved" && d.status !== "Sent")
+    .map((d) => d.pair);
 
   // Build date history from previousDates across all participants
   const dateHistory = useMemo(() => {
@@ -112,6 +122,51 @@ export default function MatchesPage() {
       </header>
 
       {/* ── Draft Matches ─────────────────────────────────────────── */}
+      {showApproveAll && (
+        <Modal eyebrow="Curation sheet" title="Approve All Visible Pairs" onClose={() => { setShowApproveAll(false); setApproveAllDone(false); }}>
+          {approveAllDone ? (
+            <>
+              <p style={{ marginTop: 14 }}>
+                <CheckCircle2 size={16} style={{ color: "var(--green)", verticalAlign: "middle", marginRight: 6 }} />
+                {approvablePairs.length} pair{approvablePairs.length !== 1 ? "s" : ""} approved.
+              </p>
+              <div className="confirm-actions">
+                <button className="primary" onClick={() => { setShowApproveAll(false); setApproveAllDone(false); }} type="button">Done</button>
+              </div>
+            </>
+          ) : approvablePairs.length === 0 ? (
+            <>
+              <p style={{ marginTop: 14 }}>All visible pairs are already approved or sent.</p>
+              <div className="confirm-actions">
+                <button onClick={() => setShowApproveAll(false)} type="button">Close</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p style={{ marginTop: 14 }}>
+                Approve <strong>{approvablePairs.length}</strong> pair{approvablePairs.length !== 1 ? "s" : ""}
+                {draftSearch.trim() || draftStatus !== "All" ? " matching current filters" : ""}?
+                Already-approved and sent pairs are unaffected.
+              </p>
+              <div className="draft-approval-list" style={{ maxHeight: 240, overflowY: "auto" }}>
+                {approvablePairs.map((pair) => (
+                  <div className="draft-approval-item" key={pair} style={{ cursor: "default" }}>
+                    <CheckCircle2 size={16} style={{ color: "var(--green)", flexShrink: 0 }} />
+                    <label style={{ cursor: "default" }}>{pair}</label>
+                  </div>
+                ))}
+              </div>
+              <div className="confirm-actions">
+                <button onClick={() => setShowApproveAll(false)} type="button">Cancel</button>
+                <button className="primary" onClick={() => { bulkApproveDrafts(approvablePairs); setApproveAllDone(true); }} type="button">
+                  <CheckCircle2 size={16} />Approve All
+                </button>
+              </div>
+            </>
+          )}
+        </Modal>
+      )}
+
       <section style={{ marginTop: 14 }}>
         <div className="panel">
           <div className="section-head">
@@ -119,6 +174,15 @@ export default function MatchesPage() {
               <p className="eyebrow">Curation sheet</p>
               <h2>Draft Pairs · {filteredDrafts.length} of {matchDrafts.length}</h2>
             </div>
+            <button
+              className={approvablePairs.length > 0 ? "primary" : undefined}
+              disabled={approvablePairs.length === 0}
+              onClick={() => { setApproveAllDone(false); setShowApproveAll(true); }}
+              type="button"
+            >
+              <CheckCircle2 size={16} />
+              Approve All{approvablePairs.length > 0 ? ` (${approvablePairs.length})` : ""}
+            </button>
           </div>
 
           <div className="filter-bar">
