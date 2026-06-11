@@ -9,6 +9,7 @@ export { SESSION_COOKIE };
 const PUBLIC_EXACT = new Set([
   "/api/auth/login",
   "/api/auth/logout",
+  "/api/health",
   "/api/log",
   "/forms/summer-2026/register",
   "/forms/summer-2026",
