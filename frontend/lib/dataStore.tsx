@@ -365,21 +365,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Collect all matches per participant
     // Partners are shown by session display name only (e.g. "Mary 1") for privacy
     const sessionId = "Summer 2026";
-    const matchesForParticipant: Record<string, { id: string; name: string; firstName: string; partners: string[] }> = {};
+    const matchesForParticipant: Record<string, { id: string; name: string; firstName: string; partners: { name: string; phone: string }[] }> = {};
     for (const draft of approvedDrafts) {
       const pA = draft.participantAId ? participants.find((p) => p.id === draft.participantAId) : participants.find((p) => p.name === draft.pair.split(" + ")[0]);
       const pB = draft.participantBId ? participants.find((p) => p.id === draft.participantBId) : participants.find((p) => p.name === draft.pair.split(" + ")[1]);
       if (!pA || !pB) continue;
       if (!matchesForParticipant[pA.id]) matchesForParticipant[pA.id] = { id: pA.id, name: pA.name, firstName: pA.name.split(" ")[0], partners: [] };
       if (!matchesForParticipant[pB.id]) matchesForParticipant[pB.id] = { id: pB.id, name: pB.name, firstName: pB.name.split(" ")[0], partners: [] };
-      matchesForParticipant[pA.id].partners.push(getDisplayName(pB.id, sessionId));
-      matchesForParticipant[pB.id].partners.push(getDisplayName(pA.id, sessionId));
+      matchesForParticipant[pA.id].partners.push({ name: getDisplayName(pB.id, sessionId), phone: pB.phone });
+      matchesForParticipant[pB.id].partners.push({ name: getDisplayName(pA.id, sessionId), phone: pA.phone });
     }
 
     // Generate one email per participant (don't overwrite manually edited ones)
     for (const { id, firstName, partners } of Object.values(matchesForParticipant)) {
       if (emailMap[id]?.status === "sent") continue; // don't regenerate if already sent
-      const dateList = partners.map((n, i) => `${i + 1}. ${n}`).join("\n");
+      const dateList = partners
+        .map((partner, i) => `${i + 1}. ${partner.name} - ${partner.phone.trim() || "phone not listed"}`)
+        .join("\n");
       emailMap[id] = {
         subject: "Your curated dates — Summer 2026",
         body: [
