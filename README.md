@@ -405,17 +405,39 @@ App still shows old sample records after PostgreSQL cleanup:
 - Limit pgAdmin access and change its default password for shared environments.
 - Treat participant contact info, pastoral notes, feedback, and relationship history as confidential.
 
-## Command Reference
+## Scripts Reference
+
+All commands below are run from the repo root.
+
+| Script | Purpose | Typical Use |
+| --- | --- | --- |
+| `./scripts/setup.sh` | Full first-time setup. Installs dependencies, prepares Postgres, initializes tables, builds the frontend, and starts services. | Run once on a fresh machine, or after a major setup change. |
+| `./scripts/dev.sh` | Starts the local development stack. | Daily local development after setup is complete. |
+| `./scripts/startup.sh` | Starts backend and frontend in a production-style flow. | Server/container startup where one command should run both services. |
+| `./scripts/migrate.sh` | Initializes or updates database tables using the backend models. | Run after changing `DATABASE_URL` or pulling backend schema changes. |
+| `./scripts/seed.sh` | Loads the small sample session and three sample participants. | Quick demo or smoke test. |
+| `./scripts/generate-test-people.sh` | Loads the larger synthetic participant batch. | Local testing with realistic volume. |
+| `./scripts/clear-dummy-data.sh` | Previews or deletes seed/synthetic demo data. | Run without flags first, then use `--yes` only after checking the preview. |
+| `./scripts/create-session.sh` | Creates or updates a chapter session. | New chapter/session setup. |
+| `./scripts/setup-db-viewer.sh` | Starts pgAdmin in Docker and preloads an LDC database connection. | Give an operator a browser-based database viewer. |
+| `./scripts/build-operator-guide.py` | Regenerates the printable PDF/ODT setup guide from Markdown. | After editing `docs/chapter-setup-guide.md`. |
+
+Common script commands:
 
 ```bash
 ./scripts/setup.sh
 ./scripts/dev.sh
-./scripts/migrate.sh
-./scripts/seed.sh
-./scripts/generate-test-people.sh
 ./scripts/setup-db-viewer.sh
 ./scripts/clear-dummy-data.sh
 ./scripts/clear-dummy-data.sh --yes
+./scripts/clear-dummy-data.sh --all-operational-data
+./scripts/clear-dummy-data.sh --all-operational-data --yes
 ./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12 --location "Parish Hall" --registration-open --attach-default-intake
-./scripts/build-operator-guide.py
 ```
+
+Destructive commands:
+
+- `./scripts/clear-dummy-data.sh --yes` deletes detected demo/synthetic data.
+- `./scripts/clear-dummy-data.sh --all-operational-data --yes` deletes all operational rows, including real participants, sessions, audit logs, and staff users.
+
+Always make a backup before either destructive command on a real database.
