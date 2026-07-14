@@ -198,7 +198,7 @@ You can also clear browser-side console data inside the site:
 5. Use `Clear Sessions Too` to remove sessions as well.
 6. Type `CLEAR` when the confirmation box asks for it.
 
-Use the same `Data Management` panel to import participant CSV files. Export Excel or Google Sheets files as CSV first.
+Use the same `Data Management` panel to import participant CSV or Excel `.xlsx` files. For LDC signup workbooks, the importer uses the populated `Form Responses` sheet.
 
 To confirm email delivery can reach Gmail, open `Audit`, find `SMTP - Gmail`, and click `Check Relay` after the SMTP fields are filled in. A green message means the server can reach the SMTP relay.
 

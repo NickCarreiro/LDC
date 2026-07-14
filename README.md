@@ -64,7 +64,7 @@ Organizer console pages:
 - `/matching`: score potential pairs and draft matches.
 - `/matches`: review matchups and dating history.
 - `/drafts`: prepare draft date emails.
-- `/audit`: review audit/access-control information, import CSVs, clear browser-side session data, and manage SMTP-related local settings.
+- `/audit`: review audit/access-control information, import CSV/XLSX files, clear browser-side session data, and manage SMTP-related local settings.
 
 Public or semi-public form pages:
 
@@ -353,7 +353,7 @@ Recommended chapter setup flow:
 5. Use `Matching Workbench` to score possible pairs and draft recommendations.
 6. Use `Curation Table` to review matchups and date history.
 7. Use `Draft Emails` to prepare communication drafts.
-8. Use `Audit` to review access/audit information, import CSVs, clear browser-side data, manage local SMTP settings, and check that the SMTP relay is reachable.
+8. Use `Audit` to review access/audit information, import CSV/XLSX files, clear browser-side data, manage local SMTP settings, and check that the SMTP relay is reachable.
 
 Organizers remain responsible for final decisions. Scores and drafts are support tools.
 
@@ -363,13 +363,13 @@ Open `Audit` and use the `Data Management` panel for browser-side console data.
 
 Available actions:
 
-- `Import Previewed Rows`: imports the currently previewed participant CSV rows.
+- `Import Previewed Rows`: imports the currently previewed participant rows.
 - `Clear Participant Data`: clears browser-side participants, match drafts, generated emails, and display names while keeping sessions.
 - `Clear Sessions Too`: clears browser-side sessions plus participants, match drafts, generated emails, and display names.
 
 The clear buttons require typing `CLEAR` before they run.
 
-CSV import currently accepts `.csv` files. If your source is Google Sheets or Excel, export/download the sheet as CSV first. The importer recognizes common participant columns such as name, first name, last name, email, phone, gender, age, location, interests, desired dates, age range, vision, status, fee, and notes.
+Import accepts `.csv` and `.xlsx` files. For LDC signup workbooks, the importer scans workbook sheets and uses the first populated `Form Responses` sheet when present. It recognizes the current LDC form columns such as first/last name, full name, email, phone, gender, age, location, interests, max dates, age range, previous dates, cannot-date names, vision, welcome email, orientation date, card, RSVP, and notes.
 
 Database cleanup and browser-side cleanup are separate:
 

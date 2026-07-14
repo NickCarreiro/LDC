@@ -145,7 +145,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 2831 >>
+<< /Length 2876 >>
 stream
 BT /F3 9 Tf 54 738 Td (./scripts/clear-dummy-data.sh) Tj ET
 BT /F1 10 Tf 54 710 Td (Read the numbers it prints. This command does not delete anything.) Tj ET
@@ -163,8 +163,8 @@ BT /F1 10 Tf 54 507 Td (3. Find Data Management.) Tj ET
 BT /F1 10 Tf 54 493 Td (4. Use Clear Participant Data to keep sessions.) Tj ET
 BT /F1 10 Tf 54 479 Td (5. Use Clear Sessions Too to remove sessions as well.) Tj ET
 BT /F1 10 Tf 54 465 Td (6. Type CLEAR when the confirmation box asks for it.) Tj ET
-BT /F1 10 Tf 54 444 Td (Use the same Data Management panel to import participant CSV files. Export Excel) Tj ET
-BT /F1 10 Tf 54 430 Td (  or Google Sheets files as CSV first.) Tj ET
+BT /F1 10 Tf 54 444 Td (Use the same Data Management panel to import participant CSV or Excel .xlsx files.) Tj ET
+BT /F1 10 Tf 54 430 Td (  For LDC signup workbooks, the importer uses the populated Form Responses sheet.) Tj ET
 BT /F1 10 Tf 54 409 Td (To confirm email delivery can reach Gmail, open Audit, find SMTP - Gmail, and) Tj ET
 BT /F1 10 Tf 54 395 Td (  click Check Relay after the SMTP fields are filled in. A green message means the) Tj ET
 BT /F1 10 Tf 54 381 Td (  server can reach the SMTP relay.) Tj ET
@@ -372,17 +372,17 @@ xref
 0000005841 00000 n 
 0000008205 00000 n 
 0000008353 00000 n 
-0000011237 00000 n 
-0000011385 00000 n 
-0000014019 00000 n 
-0000014167 00000 n 
-0000016954 00000 n 
-0000017102 00000 n 
-0000019712 00000 n 
-0000019860 00000 n 
-0000021714 00000 n 
+0000011282 00000 n 
+0000011430 00000 n 
+0000014064 00000 n 
+0000014212 00000 n 
+0000016999 00000 n 
+0000017147 00000 n 
+0000019757 00000 n 
+0000019905 00000 n 
+0000021759 00000 n 
 trailer
 << /Size 22 /Root 1 0 R >>
 startxref
-21862
+21907
 %%EOF
