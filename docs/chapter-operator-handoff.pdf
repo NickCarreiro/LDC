@@ -1,0 +1,253 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+7 0 obj
+<< /Length 2516 >>
+stream
+BT /F2 18 Tf 54 732 Td (LDC Chapter Operator Handoff Guide) Tj ET
+BT /F1 10 Tf 54 703 Td (This guide is for a chapter operator who is not expected to be technical. Follow) Tj ET
+BT /F1 10 Tf 54 689 Td (  the steps in order. If something fails, stop and send the exact error message to) Tj ET
+BT /F1 10 Tf 54 675 Td (  the person helping you.) Tj ET
+BT /F2 13 Tf 54 649 Td (What You Are Setting Up) Tj ET
+BT /F1 10 Tf 54 624 Td (You are setting up three things:) Tj ET
+BT /F1 10 Tf 54 603 Td (1. The LDC app, where organizers manage participants and sessions.) Tj ET
+BT /F1 10 Tf 54 589 Td (2. The PostgreSQL database, where the app stores records.) Tj ET
+BT /F1 10 Tf 54 575 Td (3. pgAdmin, a database viewer that lets you inspect the database in a browser.) Tj ET
+BT /F1 10 Tf 54 554 Td (You do not need to understand database internals to complete this setup. You only) Tj ET
+BT /F1 10 Tf 54 540 Td (  need to copy and run the commands exactly.) Tj ET
+BT /F2 13 Tf 54 514 Td (Before You Start) Tj ET
+BT /F1 10 Tf 54 489 Td (Ask your technical helper for:) Tj ET
+BT /F1 10 Tf 54 468 Td (- The GitHub repository link.) Tj ET
+BT /F1 10 Tf 54 454 Td (- The .env file or the exact database settings to put in .env.) Tj ET
+BT /F1 10 Tf 54 440 Td (- The database password.) Tj ET
+BT /F1 10 Tf 54 426 Td (- The organizer login password for the site.) Tj ET
+BT /F1 10 Tf 54 412 Td (- The name, date, and location for your chapter's first session.) Tj ET
+BT /F1 10 Tf 54 391 Td (Do not send passwords through regular email or text if you can avoid it. Use a) Tj ET
+BT /F1 10 Tf 54 377 Td (  password manager, secure note, or phone call.) Tj ET
+BT /F2 13 Tf 54 351 Td (Open A Terminal) Tj ET
+BT /F1 10 Tf 54 326 Td (On Mac:) Tj ET
+BT /F1 10 Tf 54 305 Td (1. Open Spotlight with Command + Space.) Tj ET
+BT /F1 10 Tf 54 291 Td (2. Type Terminal.) Tj ET
+BT /F1 10 Tf 54 277 Td (3. Press Enter.) Tj ET
+BT /F1 10 Tf 54 256 Td (On Windows:) Tj ET
+BT /F1 10 Tf 54 235 Td (1. Install Windows Terminal if you do not already have it.) Tj ET
+BT /F1 10 Tf 54 221 Td (2. Open Windows Terminal.) Tj ET
+BT /F1 10 Tf 54 207 Td (3. Use the Ubuntu/Linux tab if this project was set up through WSL.) Tj ET
+BT /F1 10 Tf 54 186 Td (On Linux:) Tj ET
+BT /F1 10 Tf 54 165 Td (1. Open the Terminal app.) Tj ET
+BT /F2 13 Tf 54 139 Td (Get The Code) Tj ET
+BT /F1 10 Tf 54 114 Td (Your helper may do this part for you. If not, run:) Tj ET
+BT /F3 9 Tf 54 93 Td (git clone https://github.com/NickCarreiro/LDC.git) Tj ET
+BT /F3 9 Tf 54 79 Td (cd LDC) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2020 >>
+stream
+BT /F1 10 Tf 54 738 Td (If the folder already exists:) Tj ET
+BT /F3 9 Tf 54 717 Td (cd LDC) Tj ET
+BT /F3 9 Tf 54 703 Td (git pull) Tj ET
+BT /F2 13 Tf 54 670 Td (Create The Settings File) Tj ET
+BT /F1 10 Tf 54 645 Td (Run:) Tj ET
+BT /F3 9 Tf 54 624 Td (cp .env.example .env) Tj ET
+BT /F1 10 Tf 54 596 Td (Then open .env in a text editor. Your helper should tell you what values to use.) Tj ET
+BT /F1 10 Tf 54 575 Td (The most important line is DATABASE_URL. It usually looks like this:) Tj ET
+BT /F3 9 Tf 54 554 Td (DATABASE_URL=postgresql+psycopg://ldc:ldc_dev_password@localhost:5432/ldc) Tj ET
+BT /F1 10 Tf 54 526 Td (If your helper gave you a different database host, port, username, or password,) Tj ET
+BT /F1 10 Tf 54 512 Td (  use what they gave you.) Tj ET
+BT /F2 13 Tf 54 486 Td (Start The App) Tj ET
+BT /F1 10 Tf 54 461 Td (Run:) Tj ET
+BT /F3 9 Tf 54 440 Td (./scripts/setup.sh) Tj ET
+BT /F1 10 Tf 54 412 Td (This can take several minutes. It installs tools, prepares the database, builds) Tj ET
+BT /F1 10 Tf 54 398 Td (  the website, and starts the services.) Tj ET
+BT /F1 10 Tf 54 377 Td (When it is done, open:) Tj ET
+BT /F3 9 Tf 54 356 Td (http://localhost:3000) Tj ET
+BT /F1 10 Tf 54 328 Td (If the page asks for a password, use the organizer password your helper gave you.) Tj ET
+BT /F2 13 Tf 54 302 Td (Open The Database Viewer) Tj ET
+BT /F1 10 Tf 54 277 Td (Run:) Tj ET
+BT /F3 9 Tf 54 256 Td (./scripts/setup-db-viewer.sh) Tj ET
+BT /F1 10 Tf 54 228 Td (Then open:) Tj ET
+BT /F3 9 Tf 54 207 Td (http://localhost:5050) Tj ET
+BT /F1 10 Tf 54 179 Td (Use this login unless your helper gave you a different one:) Tj ET
+BT /F3 9 Tf 54 158 Td (Email: admin@ldc.local) Tj ET
+BT /F3 9 Tf 54 144 Td (Password: ldc_pgadmin_change_me) Tj ET
+BT /F1 10 Tf 54 116 Td (Important: if this is more than a private local test, ask your helper to set a) Tj ET
+BT /F1 10 Tf 54 102 Td (  stronger pgAdmin password.) Tj ET
+BT /F1 10 Tf 54 81 Td (Inside pgAdmin:) Tj ET
+BT /F1 10 Tf 54 60 Td (1. Look at the left sidebar.) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2391 >>
+stream
+BT /F1 10 Tf 54 738 Td (2. Expand Servers.) Tj ET
+BT /F1 10 Tf 54 724 Td (3. Click LDC PostgreSQL.) Tj ET
+BT /F1 10 Tf 54 710 Td (4. If it asks for a password, use the database password from .env.) Tj ET
+BT /F1 10 Tf 54 696 Td (5. Expand Databases.) Tj ET
+BT /F1 10 Tf 54 682 Td (6. Expand ldc.) Tj ET
+BT /F1 10 Tf 54 668 Td (7. Expand Schemas.) Tj ET
+BT /F1 10 Tf 54 654 Td (8. Expand public.) Tj ET
+BT /F1 10 Tf 54 640 Td (9. Expand Tables.) Tj ET
+BT /F1 10 Tf 54 619 Td (The most useful tables are:) Tj ET
+BT /F1 10 Tf 54 598 Td (- program_sessions: chapter sessions.) Tj ET
+BT /F1 10 Tf 54 584 Td (- participants: participant records.) Tj ET
+BT /F1 10 Tf 54 570 Td (- session_registrations: who registered for which session.) Tj ET
+BT /F1 10 Tf 54 556 Td (- match_drafts: draft matches.) Tj ET
+BT /F1 10 Tf 54 542 Td (- date_history: previous date history.) Tj ET
+BT /F1 10 Tf 54 521 Td (To view a table:) Tj ET
+BT /F1 10 Tf 54 500 Td (1. Right-click the table.) Tj ET
+BT /F1 10 Tf 54 486 Td (2. Choose View/Edit Data.) Tj ET
+BT /F1 10 Tf 54 472 Td (3. Choose All Rows.) Tj ET
+BT /F1 10 Tf 54 451 Td (Do not edit database rows directly unless your helper tells you to. Viewing is) Tj ET
+BT /F1 10 Tf 54 437 Td (  safer than editing.) Tj ET
+BT /F2 13 Tf 54 411 Td (Remove Demo Data) Tj ET
+BT /F1 10 Tf 54 386 Td (First run a preview:) Tj ET
+BT /F3 9 Tf 54 365 Td (./scripts/clear-dummy-data.sh) Tj ET
+BT /F1 10 Tf 54 337 Td (Read the numbers it prints. This command does not delete anything.) Tj ET
+BT /F1 10 Tf 54 316 Td (If the preview looks right, run:) Tj ET
+BT /F3 9 Tf 54 295 Td (./scripts/clear-dummy-data.sh --yes) Tj ET
+BT /F1 10 Tf 54 267 Td (This removes the sample people and synthetic test data that are only meant for) Tj ET
+BT /F1 10 Tf 54 253 Td (  demos.) Tj ET
+BT /F1 10 Tf 54 232 Td (If you want to keep the sample session names but remove sample people, run:) Tj ET
+BT /F3 9 Tf 54 211 Td (./scripts/clear-dummy-data.sh --keep-generated-sessions --yes) Tj ET
+BT /F1 10 Tf 54 183 Td (If you are unsure, stop and ask your helper before using --yes.) Tj ET
+BT /F2 13 Tf 54 157 Td (Create Your Chapter Session) Tj ET
+BT /F1 10 Tf 54 132 Td (Choose:) Tj ET
+BT /F1 10 Tf 54 111 Td (- A session name.) Tj ET
+BT /F1 10 Tf 54 97 Td (- A start date.) Tj ET
+BT /F1 10 Tf 54 83 Td (- A location label.) Tj ET
+BT /F1 10 Tf 54 69 Td (- Whether registration should be open now.) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2440 >>
+stream
+BT /F1 10 Tf 54 738 Td (Example:) Tj ET
+BT /F3 9 Tf 54 717 Td (./scripts/create-session.sh \\) Tj ET
+BT /F3 9 Tf 54 703 Td (  --name "Fall 2026 - Your Chapter" \\) Tj ET
+BT /F3 9 Tf 54 689 Td (  --starts-on 2026-09-12 \\) Tj ET
+BT /F3 9 Tf 54 675 Td (  --location "Your Parish Hall" \\) Tj ET
+BT /F3 9 Tf 54 661 Td (  --registration-open \\) Tj ET
+BT /F3 9 Tf 54 647 Td (  --attach-default-intake) Tj ET
+BT /F1 10 Tf 54 619 Td (Replace:) Tj ET
+BT /F1 10 Tf 54 598 Td (- Fall 2026 - Your Chapter with your real session name.) Tj ET
+BT /F1 10 Tf 54 584 Td (- 2026-09-12 with your real date.) Tj ET
+BT /F1 10 Tf 54 570 Td (- Your Parish Hall with your real location.) Tj ET
+BT /F1 10 Tf 54 549 Td (If registration is not open yet, remove the --registration-open line.) Tj ET
+BT /F1 10 Tf 54 528 Td (To confirm the session exists, open pgAdmin and look in the program_sessions) Tj ET
+BT /F1 10 Tf 54 514 Td (  table.) Tj ET
+BT /F2 13 Tf 54 488 Td (Everyday Startup) Tj ET
+BT /F1 10 Tf 54 463 Td (If everything is already installed and you just need to start working, run:) Tj ET
+BT /F3 9 Tf 54 442 Td (./scripts/dev.sh) Tj ET
+BT /F1 10 Tf 54 414 Td (Then open:) Tj ET
+BT /F3 9 Tf 54 393 Td (http://localhost:3000) Tj ET
+BT /F1 10 Tf 54 365 Td (If your helper set up system services instead, they may give you a different) Tj ET
+BT /F1 10 Tf 54 351 Td (  startup command.) Tj ET
+BT /F2 13 Tf 54 325 Td (Make A Backup Before Big Changes) Tj ET
+BT /F1 10 Tf 54 300 Td (Before deleting data, importing real participants, or changing session setup, make) Tj ET
+BT /F1 10 Tf 54 286 Td (  a backup:) Tj ET
+BT /F3 9 Tf 54 265 Td (pg_dump "postgresql://ldc:ldc_dev_password@localhost:5432/ldc" \\) Tj ET
+BT /F3 9 Tf 54 251 Td (  --format=custom \\) Tj ET
+BT /F3 9 Tf 54 237 Td (  --file "ldc-backup-$\(date +%Y%m%d%H%M%S\).dump") Tj ET
+BT /F1 10 Tf 54 209 Td (If your .env uses a different database password or port, ask your helper for the) Tj ET
+BT /F1 10 Tf 54 195 Td (  exact backup command.) Tj ET
+BT /F1 10 Tf 54 174 Td (Keep backups somewhere private. They may contain sensitive participant) Tj ET
+BT /F1 10 Tf 54 160 Td (  information.) Tj ET
+BT /F2 13 Tf 54 134 Td (What To Send Your Helper If Something Breaks) Tj ET
+BT /F1 10 Tf 54 109 Td (Send these four things:) Tj ET
+BT /F1 10 Tf 54 88 Td (1. What you were trying to do.) Tj ET
+BT /F1 10 Tf 54 74 Td (2. The command you ran.) Tj ET
+BT /F1 10 Tf 54 60 Td (3. The full error message.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 2523 >>
+stream
+BT /F1 10 Tf 54 738 Td (4. A screenshot if the problem happened in the browser.) Tj ET
+BT /F1 10 Tf 54 717 Td (Do not send the .env file or database password in a group chat.) Tj ET
+BT /F2 13 Tf 54 691 Td (Common Problems) Tj ET
+BT /F1 10 Tf 54 666 Td (Problem: permission denied) Tj ET
+BT /F1 10 Tf 54 645 Td (Try:) Tj ET
+BT /F3 9 Tf 54 624 Td (chmod +x scripts/*.sh) Tj ET
+BT /F1 10 Tf 54 596 Td (Then run the command again.) Tj ET
+BT /F1 10 Tf 54 575 Td (Problem: database does not exist or connection refused) Tj ET
+BT /F1 10 Tf 54 554 Td (The database is not running or .env points to the wrong place. Send the error to) Tj ET
+BT /F1 10 Tf 54 540 Td (  your helper.) Tj ET
+BT /F1 10 Tf 54 519 Td (Problem: pgAdmin opens but cannot connect to LDC PostgreSQL) Tj ET
+BT /F1 10 Tf 54 498 Td (Run:) Tj ET
+BT /F3 9 Tf 54 477 Td (./scripts/setup-db-viewer.sh --replace) Tj ET
+BT /F1 10 Tf 54 449 Td (If it still fails, send your helper the error from pgAdmin.) Tj ET
+BT /F1 10 Tf 54 428 Td (Problem: The app still shows old fake people after clearing dummy data) Tj ET
+BT /F1 10 Tf 54 407 Td (Try signing out and back in. If that does not work, clear the browser storage for) Tj ET
+BT /F1 10 Tf 54 393 Td (  localhost:3000 and reload the page.) Tj ET
+BT /F1 10 Tf 54 372 Td (Problem: You typed the wrong session name or date) Tj ET
+BT /F1 10 Tf 54 351 Td (Run create-session.sh again with the same session name and corrected details. The) Tj ET
+BT /F1 10 Tf 54 337 Td (  script updates an existing session when the name matches.) Tj ET
+BT /F2 13 Tf 54 311 Td (Safe Rules) Tj ET
+BT /F1 10 Tf 54 286 Td (- Do not delete real participant data without a backup.) Tj ET
+BT /F1 10 Tf 54 272 Td (- Do not share .env.) Tj ET
+BT /F1 10 Tf 54 258 Td (- Do not edit pgAdmin rows directly unless asked.) Tj ET
+BT /F1 10 Tf 54 244 Td (- Do not reuse demo sessions for a real chapter.) Tj ET
+BT /F1 10 Tf 54 230 Td (- When in doubt, stop and ask.) Tj ET
+BT /F2 13 Tf 54 204 Td (Quick Command List) Tj ET
+BT /F3 9 Tf 54 179 Td (git pull) Tj ET
+BT /F3 9 Tf 54 165 Td (cp .env.example .env) Tj ET
+BT /F3 9 Tf 54 151 Td (./scripts/setup.sh) Tj ET
+BT /F3 9 Tf 54 137 Td (./scripts/setup-db-viewer.sh) Tj ET
+BT /F3 9 Tf 54 123 Td (./scripts/clear-dummy-data.sh) Tj ET
+BT /F3 9 Tf 54 109 Td (./scripts/clear-dummy-data.sh --yes) Tj ET
+BT /F3 9 Tf 54 95 Td (./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12) Tj ET
+BT /F3 9 Tf 54 81 Td (--location "Parish Hall" --registration-open --attach-default-intake) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 15 0 R >>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000142 00000 n 
+0000000212 00000 n 
+0000000287 00000 n 
+0000000355 00000 n 
+0000002923 00000 n 
+0000003069 00000 n 
+0000005141 00000 n 
+0000005287 00000 n 
+0000007731 00000 n 
+0000007879 00000 n 
+0000010372 00000 n 
+0000010520 00000 n 
+0000013096 00000 n 
+trailer
+<< /Size 16 /Root 1 0 R >>
+startxref
+13244
+%%EOF

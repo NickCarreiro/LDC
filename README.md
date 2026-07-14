@@ -32,6 +32,12 @@ Useful local URLs:
 
 See [docs/database-operations.md](docs/database-operations.md) for database access, pgAdmin viewer setup, dummy-data cleanup, and chapter session setup.
 
+For non-technical chapter operators, use the hand-holding guide in:
+
+- [docs/chapter-operator-handoff.pdf](docs/chapter-operator-handoff.pdf)
+- [docs/chapter-operator-handoff.odt](docs/chapter-operator-handoff.odt)
+- [docs/chapter-operator-handoff.md](docs/chapter-operator-handoff.md)
+
 Common commands:
 
 ```bash
