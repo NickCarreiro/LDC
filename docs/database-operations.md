@@ -37,6 +37,16 @@ DATABASE_URL=postgresql+psycopg://ldc:ldc_dev_password@localhost:5432/ldc
 From a clean clone:
 
 ```bash
+./scripts/bootstrap.sh
+```
+
+That is the recommended handoff path. It prompts for database credentials, organizer login, pgAdmin login, SMTP settings, and whether to load browser-side sample data. It then writes `.env`, creates the PostgreSQL user/database, initializes tables, installs dependencies, builds the frontend, and can start pgAdmin.
+
+If `.env` already exists, bootstrap pre-fills non-secret prompts and lets the operator press Enter to preserve existing secret values, including the SMTP app password.
+
+Manual setup path:
+
+```bash
 cp .env.example .env
 ./scripts/setup.sh
 ```
@@ -281,17 +291,15 @@ If the app still shows old dummy data after the PostgreSQL cleanup:
 Give the operator:
 
 - The repository URL.
-- Their `.env` values, provided through a secure channel.
-- The database host, port, name, username, and password.
+- The database host, port, name, username, and password if they are connecting to an existing database.
 - The pgAdmin URL and pgAdmin login if you run it for them.
+- The SMTP address and app password if they are using an existing email account.
 - A reminder that participant records and notes are sensitive.
 
 Have them run:
 
 ```bash
-cp .env.example .env
-# edit .env
-./scripts/setup.sh
+./scripts/bootstrap.sh
 ./scripts/setup-db-viewer.sh
 ./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12 --location "Parish Hall" --registration-open --attach-default-intake
 ```

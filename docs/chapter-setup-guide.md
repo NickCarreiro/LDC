@@ -17,9 +17,10 @@ You do not need to work inside the database for normal setup. Most steps are cop
 Ask your technical helper for:
 
 - The GitHub repository link.
-- The `.env` file or the exact database settings to put in `.env`.
-- The database password.
+- The database name, username, and password you should use.
 - The organizer login password for the site.
+- The pgAdmin email and password.
+- The SMTP/Gmail address and app password for outgoing email.
 - The name, date, and location for your chapter's first session.
 
 Do not send passwords through regular email or text if you can avoid it. Use a password manager, secure note, or phone call.
@@ -58,7 +59,30 @@ cd LDC
 git pull
 ```
 
-## Create The Settings File
+## Run The Setup Script
+
+From inside the `LDC` folder, run:
+
+```bash
+./scripts/bootstrap.sh
+```
+
+The script will ask for the database password, organizer password, pgAdmin password, and SMTP app password. Type carefully; password prompts do not show characters while you type.
+
+If setup has already been run on this computer, the script may say you can press Enter to keep an existing password. That keeps the password already saved in `.env`.
+
+When the script asks about SMTP:
+
+- Use `smtp.gmail.com` for Gmail.
+- Use port `587`.
+- Use the chapter Gmail address as the SMTP username.
+- Use a Gmail App Password, not the regular Gmail account password.
+
+The script creates `.env`, creates the database, installs dependencies, initializes the database tables, and builds the site.
+
+After setup, the site's Audit page can load these SMTP settings from `.env` for a logged-in organizer. Do not share `.env`; it contains the SMTP app password.
+
+## Manual Settings File Option
 
 Run:
 
@@ -81,12 +105,12 @@ If your helper gave you a different database host, port, username, or password, 
 Run:
 
 ```bash
-./scripts/setup.sh
+./scripts/startup.sh
 ```
 
-This can take several minutes. It installs tools, prepares the database, builds the website, and starts the services.
+This starts the backend and frontend services. Leave the terminal open while using the site.
 
-When it is done, open:
+When it says both services are running, open:
 
 ```text
 http://localhost:3000
@@ -164,6 +188,17 @@ If the preview looks right, run:
 This removes the sample people and synthetic test data that are only meant for demos.
 
 If the site still shows sample people after this, reload after pulling the latest version of the site. Older versions kept sample people in the browser. If they still appear, clear browser storage for the site and reload.
+
+You can also clear browser-side console data inside the site:
+
+1. Open the site.
+2. Go to `Audit`.
+3. Find `Data Management`.
+4. Use `Clear Participant Data` to keep sessions.
+5. Use `Clear Sessions Too` to remove sessions as well.
+6. Type `CLEAR` when the confirmation box asks for it.
+
+Use the same `Data Management` panel to import participant CSV files. Export Excel or Google Sheets files as CSV first.
 
 If you want to keep the sample session names but remove sample people, run:
 
@@ -302,8 +337,7 @@ Run `create-session.sh` again with the same session name and corrected details. 
 
 ```bash
 git pull
-cp .env.example .env
-./scripts/setup.sh
+./scripts/bootstrap.sh
 ./scripts/setup-db-viewer.sh
 ./scripts/clear-dummy-data.sh
 ./scripts/clear-dummy-data.sh --yes

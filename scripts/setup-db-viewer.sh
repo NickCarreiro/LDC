@@ -60,10 +60,41 @@ for arg in "$@"; do
 done
 
 if [ -f "$ENV_FILE" ]; then
-  # shellcheck disable=SC1090
-  set -a
-  . "$ENV_FILE"
-  set +a
+  ENV_EXPORTS="$(python3 - "$ENV_FILE" <<'PY'
+import shlex
+import sys
+from pathlib import Path
+
+allowed = {
+    "POSTGRES_HOST_PORT",
+    "PGADMIN_CONTAINER",
+    "PGADMIN_IMAGE",
+    "PGADMIN_PORT",
+    "PGADMIN_EMAIL",
+    "PGADMIN_PASSWORD",
+    "PGADMIN_DATA_DIR",
+    "DB_NAME",
+    "DB_USER",
+    "DB_PASSWORD",
+    "DB_HOST",
+    "DB_PORT",
+}
+
+for raw_line in Path(sys.argv[1]).read_text().splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith("#") or "=" not in line:
+        continue
+    key, value = line.split("=", 1)
+    key = key.strip()
+    if key not in allowed:
+        continue
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        value = value[1:-1]
+    print(f"{key}={shlex.quote(value)}")
+PY
+)"
+  eval "$ENV_EXPORTS"
 
   if [ -n "${POSTGRES_HOST_PORT:-}" ] && [ "${DB_PORT}" = "5432" ]; then
     DB_PORT="$POSTGRES_HOST_PORT"

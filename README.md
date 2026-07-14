@@ -10,6 +10,28 @@ This README is the main usage guide for setting up and operating the site. For a
 
 For deeper database administration, use [docs/database-operations.md](docs/database-operations.md).
 
+## Fastest Fresh Setup
+
+On a new machine, clone the repo and run the interactive bootstrap:
+
+```bash
+git clone https://github.com/NickCarreiro/LDC.git
+cd LDC
+./scripts/bootstrap.sh
+```
+
+The bootstrap prompts for:
+
+- PostgreSQL database name, user, password, and port.
+- Organizer website password.
+- pgAdmin email and password.
+- SMTP host, port, from email, display name, username, and app password.
+- Whether to load browser-side sample data.
+
+It then writes `.env`, creates the database, installs dependencies, initializes tables, builds the frontend, and optionally starts pgAdmin.
+
+If `.env` already exists, bootstrap pre-fills non-secret prompts and lets the operator press Enter to keep existing secret values, including `SMTP_PASS` and `SMTP_APP_PASSWORD`.
+
 ## System Map
 
 The repo is split into:
@@ -42,7 +64,7 @@ Organizer console pages:
 - `/matching`: score potential pairs and draft matches.
 - `/matches`: review matchups and dating history.
 - `/drafts`: prepare draft date emails.
-- `/audit`: review audit/access-control information and SMTP-related local settings.
+- `/audit`: review audit/access-control information, import CSVs, clear browser-side session data, and manage SMTP-related local settings.
 
 Public or semi-public form pages:
 
@@ -94,8 +116,18 @@ POSTGRES_HOST_PORT=5433
 DATABASE_URL=postgresql+psycopg://ldc:ldc_dev_password@localhost:5433/ldc
 BACKEND_CORS_ORIGINS=http://localhost:3000
 FIELD_ENCRYPTION_KEY=REPLACE_WITH_32_BYTE_BASE64_KEY
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_FROM=organizers@example.org
+SMTP_FROM_NAME=Little Dates Club
+SMTP_USER=organizers@example.org
+SMTP_PASS=REPLACE_WITH_SMTP_APP_PASSWORD
+SMTP_USERNAME=organizers@example.org
+SMTP_APP_PASSWORD=REPLACE_WITH_SMTP_APP_PASSWORD
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
+
+`SMTP_USER`/`SMTP_PASS` are kept for compatibility with older setup files. `SMTP_USERNAME`/`SMTP_APP_PASSWORD` are the preferred names. The Audit page loads these values from the protected `/api/smtp/config` route when browser-local SMTP settings have not already been saved.
 
 Frontend organizer login also expects these values when running the deployed/protected console:
 
@@ -126,6 +158,14 @@ Never commit `.env` or share it in normal chat.
 
 ## First-Time Setup
 
+Recommended for a brand-new operator:
+
+```bash
+./scripts/bootstrap.sh
+```
+
+Manual setup path:
+
 From the repo root:
 
 ```bash
@@ -143,6 +183,8 @@ What `setup.sh` does:
 - Installs frontend dependencies.
 - Builds the frontend.
 - Starts backend and frontend processes.
+
+`setup.sh` uses values already present in `.env`. Use `bootstrap.sh` when the operator needs to be prompted for passwords and credentials.
 
 Open the site:
 
@@ -294,14 +336,13 @@ psql "postgresql://ldc:ldc_dev_password@localhost:5433/ldc" \
 Recommended chapter setup flow:
 
 1. Pull the latest repo.
-2. Configure `.env`.
-3. Run `./scripts/setup.sh`.
-4. Run `./scripts/setup-db-viewer.sh`.
-5. Preview and remove demo data.
-6. Create the chapter session.
-7. Confirm the session in pgAdmin or `psql`.
-8. Add or import participants through approved app/API workflows.
-9. Review registrations before using matching workflows.
+2. Run `./scripts/bootstrap.sh`.
+3. Run `./scripts/setup-db-viewer.sh` if pgAdmin was skipped during bootstrap.
+4. Preview and remove demo data.
+5. Create the chapter session.
+6. Confirm the session in pgAdmin or `psql`.
+7. Add or import participants through approved app/API workflows.
+8. Review registrations before using matching workflows.
 
 ## Using The Organizer Console
 
@@ -312,9 +353,28 @@ Recommended chapter setup flow:
 5. Use `Matching Workbench` to score possible pairs and draft recommendations.
 6. Use `Curation Table` to review matchups and date history.
 7. Use `Draft Emails` to prepare communication drafts.
-8. Use `Audit` to review access/audit information and local SMTP settings.
+8. Use `Audit` to review access/audit information, import CSVs, clear browser-side data, and manage local SMTP settings.
 
 Organizers remain responsible for final decisions. Scores and drafts are support tools.
+
+## In-App Data Management
+
+Open `Audit` and use the `Data Management` panel for browser-side console data.
+
+Available actions:
+
+- `Import Previewed Rows`: imports the currently previewed participant CSV rows.
+- `Clear Participant Data`: clears browser-side participants, match drafts, generated emails, and display names while keeping sessions.
+- `Clear Sessions Too`: clears browser-side sessions plus participants, match drafts, generated emails, and display names.
+
+The clear buttons require typing `CLEAR` before they run.
+
+CSV import currently accepts `.csv` files. If your source is Google Sheets or Excel, export/download the sheet as CSV first. The importer recognizes common participant columns such as name, first name, last name, email, phone, gender, age, location, interests, desired dates, age range, vision, status, fee, and notes.
+
+Database cleanup and browser-side cleanup are separate:
+
+- Use `./scripts/clear-dummy-data.sh` for PostgreSQL records.
+- Use `Audit > Data Management` for browser-side console records.
 
 ## Backups
 
@@ -420,6 +480,7 @@ All commands below are run from the repo root.
 
 | Script | Purpose | Typical Use |
 | --- | --- | --- |
+| `./scripts/bootstrap.sh` | Interactive first-time setup. Prompts for database, organizer, pgAdmin, and SMTP credentials, writes `.env`, creates the DB, installs dependencies, initializes tables, and builds the frontend. | Best option for a fresh GitHub clone. |
 | `./scripts/setup.sh` | Full first-time setup. Installs dependencies, prepares Postgres, initializes tables, builds the frontend, and starts services. | Run once on a fresh machine, or after a major setup change. |
 | `./scripts/dev.sh` | Starts the local development stack. | Daily local development after setup is complete. |
 | `./scripts/startup.sh` | Starts backend and frontend in a production-style flow. | Server/container startup where one command should run both services. |

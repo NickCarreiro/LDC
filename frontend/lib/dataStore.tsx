@@ -73,6 +73,18 @@ type AddSessionFields = {
   notes: string;
 };
 
+type ImportParticipantFields = AddParticipantFields & {
+  status?: string;
+  fee?: string;
+  sessions?: string[];
+  previousDates?: string[];
+  cannotDate?: string[];
+  special?: boolean;
+  feedback?: string;
+  orientationDate?: string;
+  welcomeEmailSent?: boolean;
+};
+
 type Store = {
   participants: Participant[];
   sessions: Session[];
@@ -83,8 +95,11 @@ type Store = {
   updateKeyword: (id: string, updates: Partial<KeywordWeight>) => void;
   removeKeyword: (id: string) => void;
   addParticipant: (fields: AddParticipantFields) => void;
+  importParticipants: (rows: ImportParticipantFields[], fallbackSessionName?: string) => number;
+  clearParticipantData: () => void;
+  clearAllOperationalData: () => void;
   addSession: (fields: AddSessionFields) => void;
-  updateSession: (name: string, updates: Partial<Session>) => void;
+  updateSession: (id: string, updates: Partial<Session>) => void;
   updateParticipant: (id: string, updates: Partial<Participant>) => void;
   addMatchDraft: (draft: MatchDraft) => void;
   removeDraft: (pair: string) => void;
@@ -188,6 +203,60 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
     setParticipants((prev) => [...prev, newP]);
     logEvent("participant.create", name, "Identity");
+  }
+
+  function importParticipants(rows: ImportParticipantFields[], fallbackSessionName = "Imported") {
+    const imported: Participant[] = rows.map((fields, index) => {
+      const name = `${fields.firstName} ${fields.lastName}`.trim() || `Imported ${index + 1}`;
+      const firstInitial = fields.firstName.charAt(0) || name.charAt(0) || "I";
+      const lastInitial = fields.lastName.charAt(0) || "";
+      const interests = fields.interests.split(",").map((s) => s.trim()).filter(Boolean);
+      return {
+        id: `import-${Date.now()}-${index}`,
+        name,
+        initials: `${firstInitial}${lastInitial}`.toUpperCase(),
+        age: fields.age,
+        gender: fields.gender || "Unknown",
+        location: fields.location,
+        phone: fields.phone,
+        email: fields.email,
+        interests,
+        visionTags: [],
+        vision: fields.vision,
+        sessions: fields.sessions?.length ? fields.sessions : [fallbackSessionName],
+        previousDates: fields.previousDates ?? [],
+        desiredDates: fields.desiredDates,
+        ageRange: fields.ageRange,
+        fee: fields.fee ?? "pending",
+        status: fields.status ?? "Fee pending",
+        special: fields.special ?? false,
+        cannotDate: fields.cannotDate ?? [],
+        feedback: fields.feedback ?? "",
+        predictedMatches: [],
+        orientationDate: fields.orientationDate,
+        welcomeEmailSent: fields.welcomeEmailSent,
+      };
+    });
+    setParticipants((prev) => [...prev, ...imported]);
+    logEvent("participant.import_csv", `${imported.length} participants`, "Identity");
+    return imported.length;
+  }
+
+  function clearParticipantData() {
+    setParticipants([]);
+    setMatchDrafts([]);
+    setParticipantEmails({});
+    setSessionDisplayNames({});
+    logEvent("data.clear_participants", "Participants and derived data", "High");
+  }
+
+  function clearAllOperationalData() {
+    setParticipants([]);
+    setSessions([]);
+    setMatchDrafts([]);
+    setParticipantEmails({});
+    setSessionDisplayNames({});
+    logEvent("data.clear_all", "Participants, sessions, matches, emails", "High");
   }
 
   function updateParticipant(id: string, updates: Partial<Participant>) {
@@ -393,7 +462,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       value={{
         participants, sessions, matchDrafts, auditEvents,
         keywords, addKeyword, updateKeyword, removeKeyword,
-        addParticipant, addSession, updateSession, updateParticipant,
+        addParticipant, importParticipants, clearParticipantData, clearAllOperationalData,
+        addSession, updateSession, updateParticipant,
         addMatchDraft, removeDraft, updateDraftStatus, bulkApproveDrafts, updateDraftEmail,
         participantEmails, generateEmailDrafts, updateParticipantEmail, sendApprovedDrafts, addAuditEvent,
         sessionDisplayNames, generateSessionDisplayNames, getDisplayName,

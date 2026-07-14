@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckCircle2, Download, Eye, FileText, LockKeyhole, Mail, ShieldCheck, UserCheck, X } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, Database, Download, Eye, FileText, LockKeyhole, Mail, ShieldCheck, Trash2, Upload, UserCheck, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { AppShell } from "../../components/AppShell";
 import { Modal } from "../../components/Modal";
@@ -45,16 +45,177 @@ function humanAction(action: string) {
   return ACTION_LABELS[action] ?? action;
 }
 
+type CsvRow = Record<string, string>;
+
+type ImportRow = {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  age: number;
+  location: string;
+  email: string;
+  phone: string;
+  interests: string;
+  ageRange: string;
+  desiredDates: number;
+  vision: string;
+  status?: string;
+  fee?: string;
+  sessions?: string[];
+  previousDates?: string[];
+  cannotDate?: string[];
+  special?: boolean;
+  feedback?: string;
+};
+
+function parseCsv(text: string): CsvRow[] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      i += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell.trim());
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i += 1;
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell.trim());
+  if (row.some(Boolean)) rows.push(row);
+  const headers = rows.shift()?.map((h) => h.trim()) ?? [];
+  return rows.map((values) =>
+    Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]))
+  );
+}
+
+function normalizeHeader(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function pick(row: CsvRow, names: string[]) {
+  const entries = Object.entries(row).map(([key, value]) => [normalizeHeader(key), value] as const);
+  const wanted = names.map(normalizeHeader);
+  return entries.find(([key]) => wanted.includes(key))?.[1]?.trim() ?? "";
+}
+
+function splitList(value: string) {
+  return value.split(/[,;]\s*/).map((item) => item.trim()).filter(Boolean);
+}
+
+function parseAge(row: CsvRow) {
+  const age = parseInt(pick(row, ["age", "age at signup", "current age"]), 10);
+  if (Number.isFinite(age) && age > 0) return age;
+  const dob = pick(row, ["date of birth", "dob", "birthday"]);
+  const date = dob ? new Date(dob) : null;
+  if (date && Number.isFinite(date.getTime())) {
+    const now = new Date();
+    let years = now.getFullYear() - date.getFullYear();
+    const beforeBirthday =
+      now.getMonth() < date.getMonth() ||
+      (now.getMonth() === date.getMonth() && now.getDate() < date.getDate());
+    if (beforeBirthday) years -= 1;
+    return Math.max(years, 0);
+  }
+  return 0;
+}
+
+function mapCsvRows(rows: CsvRow[], fallbackSession: string): ImportRow[] {
+  return rows.map((row) => {
+    const fullName = pick(row, ["name", "full name", "your name"]);
+    const [firstFromFull, ...restName] = fullName.split(/\s+/).filter(Boolean);
+    const firstName = pick(row, ["first name", "firstname"]) || firstFromFull || "";
+    const lastName = pick(row, ["last name", "lastname", "surname"]) || restName.join(" ");
+    const city = pick(row, ["city"]);
+    const state = pick(row, ["state"]);
+    const location = pick(row, ["location", "city/state", "city state", "where do you live"]) ||
+      [city, state].filter(Boolean).join(", ");
+    const session = pick(row, ["session", "sessions", "program session"]) || fallbackSession;
+    const desiredDates = parseInt(
+      pick(row, ["desired dates", "desired dates per session", "number of dates", "max dates"]),
+      10,
+    );
+
+    return {
+      firstName,
+      lastName,
+      gender: pick(row, ["gender", "sex"]),
+      age: parseAge(row),
+      location,
+      email: pick(row, ["email", "email address"]),
+      phone: pick(row, ["phone", "phone number", "mobile"]),
+      interests: pick(row, ["interests", "hobbies"]),
+      ageRange: pick(row, ["age range", "preferred age range", "age preference"]),
+      desiredDates: Number.isFinite(desiredDates) && desiredDates > 0 ? desiredDates : 3,
+      vision: pick(row, ["vision", "vision statement", "marriage vision"]),
+      status: pick(row, ["status", "registration status"]) || "Fee pending",
+      fee: pick(row, ["fee", "payment status", "registration fee status"]) || "pending",
+      sessions: session ? splitList(session) : [fallbackSession],
+      previousDates: splitList(pick(row, ["previous dates", "prior dates", "date history"])),
+      cannotDate: splitList(pick(row, ["cannot date", "cannot-date", "blocked dates"])),
+      special: /yes|true|1/i.test(pick(row, ["special needs", "special needs flag", "review flag"])),
+      feedback: pick(row, ["feedback", "notes", "organizer notes"]),
+    };
+  }).filter((row) => row.firstName || row.lastName || row.email);
+}
+
 export default function AuditPage() {
-  const { auditEvents } = useStore();
+  const {
+    auditEvents,
+    sessions,
+    participants,
+    matchDrafts,
+    importParticipants,
+    clearParticipantData,
+    clearAllOperationalData,
+  } = useStore();
   const [showRoles, setShowRoles] = useState(false);
   const [auditLimit, setAuditLimit] = useState(50);
+  const [clearMode, setClearMode] = useState<"participants" | "all" | null>(null);
+  const [clearConfirm, setClearConfirm] = useState("");
+  const [importSession, setImportSession] = useState(sessions[0]?.name ?? "Imported CSV");
+  const [importRows, setImportRows] = useState<ImportRow[]>([]);
+  const [importHeaders, setImportHeaders] = useState<string[]>([]);
+  const [importStatus, setImportStatus] = useState("");
 
   // SMTP config — loaded from localStorage, saved on explicit Save
   const [smtp, setSmtp] = useState(loadSmtp);
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "ok" | "fail">("idle");
   const [smtpSaved, setSmtpSaved] = useState(false);
   const [pwError, setPwError] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("ldc_smtp")) return;
+    fetch("/api/smtp/config")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((config) => {
+        if (!config) return;
+        setSmtp((prev: typeof smtp) => ({
+          ...prev,
+          fromEmail: config.fromEmail || prev.fromEmail,
+          fromName: config.fromName || prev.fromName,
+          appPassword: config.appPassword || prev.appPassword,
+          port: config.port || prev.port,
+        }));
+      })
+      .catch(() => {});
+  }, []);
 
   function handleSmtpChange(key: string, val: string) {
     setSmtp((prev: typeof smtp) => ({ ...prev, [key]: val }));
@@ -84,6 +245,37 @@ export default function AuditPage() {
     if (!smtp.fromEmail || !smtp.appPassword) return;
     try { localStorage.setItem("ldc_smtp", JSON.stringify(smtp)); } catch { /* quota */ }
     setSmtpSaved(true);
+  }
+
+  async function handleImportFile(file: File | null) {
+    setImportStatus("");
+    setImportRows([]);
+    setImportHeaders([]);
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setImportStatus("Please export the sheet as CSV first. XLSX import is coming next.");
+      return;
+    }
+    const text = await file.text();
+    const parsed = parseCsv(text);
+    setImportHeaders(Object.keys(parsed[0] ?? {}));
+    setImportRows(mapCsvRows(parsed, importSession));
+    setImportStatus(`Previewed ${parsed.length} CSV rows.`);
+  }
+
+  function commitImport() {
+    const count = importParticipants(importRows, importSession);
+    setImportRows([]);
+    setImportHeaders([]);
+    setImportStatus(`Imported ${count} participants.`);
+  }
+
+  function confirmClear() {
+    if (clearConfirm !== "CLEAR") return;
+    if (clearMode === "participants") clearParticipantData();
+    if (clearMode === "all") clearAllOperationalData();
+    setClearMode(null);
+    setClearConfirm("");
   }
 
   const auditCsv = [
@@ -130,6 +322,35 @@ export default function AuditPage() {
                 <span>{role.description}</span>
               </div>
             ))}
+          </div>
+        </Modal>
+      )}
+
+      {clearMode && (
+        <Modal
+          eyebrow="Data management"
+          title={clearMode === "all" ? "Clear Sessions and Participant Data" : "Clear Participant Data"}
+          onClose={() => { setClearMode(null); setClearConfirm(""); }}
+        >
+          <p style={{ marginTop: 12 }}>
+            {clearMode === "all"
+              ? "This clears browser-side sessions, participants, match drafts, generated emails, and display names."
+              : "This clears browser-side participants, match drafts, generated emails, and display names while keeping sessions."}
+          </p>
+          <p style={{ color: "var(--ldc-red)", fontSize: 13, marginTop: 10 }}>
+            This does not create a backup. Export anything you need before continuing.
+          </p>
+          <label style={{ display: "block", marginTop: 14 }}>
+            Type CLEAR to confirm
+            <input value={clearConfirm} onChange={(e) => setClearConfirm(e.target.value)} />
+          </label>
+          <div className="confirm-actions">
+            <button onClick={() => { setClearMode(null); setClearConfirm(""); }} type="button">
+              Cancel
+            </button>
+            <button className="primary" disabled={clearConfirm !== "CLEAR"} onClick={confirmClear} type="button">
+              <Trash2 size={16} />Clear Data
+            </button>
           </div>
         </Modal>
       )}
@@ -183,6 +404,84 @@ export default function AuditPage() {
             <span><LockKeyhole size={17} />Private field access</span>
             <span><FileText size={17} />Safety and liability acknowledgements</span>
             <span><Download size={17} />CSV exports</span>
+          </div>
+        </aside>
+      </section>
+
+      <section className="content-grid" style={{ marginTop: 14 }}>
+        <div className="panel span-2">
+          <div className="section-head">
+            <div>
+              <p className="eyebrow">Imports and cleanup</p>
+              <h2>Data Management</h2>
+            </div>
+            <Database size={20} />
+          </div>
+          <div className="status-strip" style={{ marginBottom: 14 }}>
+            <div className="status-card"><span>Participants</span><strong>{participants.length}</strong></div>
+            <div className="status-card"><span>Sessions</span><strong>{sessions.length}</strong></div>
+            <div className="status-card"><span>Match drafts</span><strong>{matchDrafts.length}</strong></div>
+          </div>
+          <div className="form-grid">
+            <label>
+              Import into session
+              <select value={importSession} onChange={(e) => setImportSession(e.target.value)}>
+                {sessions.length === 0 && <option>Imported CSV</option>}
+                {sessions.map((session) => (
+                  <option key={session.id} value={session.name}>{session.name}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Participant CSV
+              <input accept=".csv,text/csv" type="file" onChange={(e) => void handleImportFile(e.target.files?.[0] ?? null)} />
+            </label>
+          </div>
+          {importStatus && <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 10 }}>{importStatus}</p>}
+          {importHeaders.length > 0 && (
+            <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
+              Headers detected: {importHeaders.slice(0, 12).join(", ")}
+              {importHeaders.length > 12 ? "…" : ""}
+            </p>
+          )}
+          {importRows.length > 0 && (
+            <div className="data-table" style={{ marginTop: 12 }}>
+              <div className="data-row data-head">
+                <span>Name</span><span>Contact</span><span>Session</span><span>Status</span>
+              </div>
+              {importRows.slice(0, 6).map((row, index) => (
+                <div className="data-row" key={`${row.email}-${index}`}>
+                  <span><strong>{row.firstName} {row.lastName}</strong><small>{row.gender}, {row.age || "age ?"}</small></span>
+                  <span>{row.email || "No email"}<small>{row.phone}</small></span>
+                  <span>{row.sessions?.join(", ") || importSession}</span>
+                  <span>{row.status}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="confirm-actions">
+            <button disabled={importRows.length === 0} onClick={commitImport} type="button">
+              <Upload size={16} />Import Previewed Rows
+            </button>
+            <button onClick={() => { setClearMode("participants"); setClearConfirm(""); }} type="button">
+              <Trash2 size={16} />Clear Participant Data
+            </button>
+            <button className="primary" onClick={() => { setClearMode("all"); setClearConfirm(""); }} type="button">
+              <Trash2 size={16} />Clear Sessions Too
+            </button>
+          </div>
+        </div>
+
+        <aside className="panel">
+          <div className="section-head">
+            <div><p className="eyebrow">CSV import</p><h2>Accepted Fields</h2></div>
+          </div>
+          <div className="check-list">
+            <span><CheckCircle2 size={17} />Name or first/last name</span>
+            <span><CheckCircle2 size={17} />Email and phone</span>
+            <span><CheckCircle2 size={17} />Gender, age, location</span>
+            <span><CheckCircle2 size={17} />Interests, desired dates, age range</span>
+            <span><CheckCircle2 size={17} />Vision, status, fee, notes</span>
           </div>
         </aside>
       </section>

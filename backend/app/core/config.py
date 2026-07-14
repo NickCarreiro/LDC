@@ -24,6 +24,19 @@ class Settings(BaseSettings):
     smtp_host: str = "localhost"
     smtp_port: int = 1025
     smtp_from: str = "organizers@example.org"
+    smtp_from_name: str = "Little Dates Club"
+    smtp_user: str = ""
+    smtp_pass: str = ""
+    smtp_username: str = ""
+    smtp_app_password: str = ""
+
+    @property
+    def effective_smtp_username(self) -> str:
+        return self.smtp_username or self.smtp_user
+
+    @property
+    def effective_smtp_app_password(self) -> str:
+        return self.smtp_app_password or self.smtp_pass
 
     @property
     def cors_origins(self) -> list[str | AnyHttpUrl]:
