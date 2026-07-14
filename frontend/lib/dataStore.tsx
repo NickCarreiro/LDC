@@ -17,7 +17,7 @@ import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
-const SCHEMA_VERSION = "v9"; // bump when seed data shape changes to force a reset
+const SCHEMA_VERSION = "v10"; // bump when seed/import data shape changes to force a reset
 const LOAD_SAMPLE_DATA = process.env.NEXT_PUBLIC_LOAD_SAMPLE_DATA === "true";
 
 const initialParticipants = LOAD_SAMPLE_DATA ? seedParticipants : [];
@@ -31,7 +31,7 @@ function load<T>(key: string, fallback: T): T {
     // If schema version doesn't match, clear all stored data and use seed
     const storedVersion = localStorage.getItem("ldc_schema");
     if (storedVersion !== SCHEMA_VERSION) {
-      ["ldc_participants","ldc_sessions","ldc_matchDrafts","ldc_auditEvents","ldc_keywords","ldc_participantEmails","ldc_smtp","ldc_sessionDisplayNames"].forEach((k) => localStorage.removeItem(k));
+      ["ldc_participants","ldc_sessions","ldc_matchDrafts","ldc_auditEvents","ldc_keywords","ldc_participantEmails","ldc_sessionDisplayNames"].forEach((k) => localStorage.removeItem(k));
       localStorage.setItem("ldc_schema", SCHEMA_VERSION);
       return fallback;
     }
