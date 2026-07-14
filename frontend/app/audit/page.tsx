@@ -8,11 +8,11 @@ import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
 
 function loadSmtp() {
-  if (typeof window === "undefined") return { fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" };
+  if (typeof window === "undefined") return { host: "smtp.gmail.com", fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" };
   try {
     const raw = localStorage.getItem("ldc_smtp");
-    return raw ? JSON.parse(raw) : { fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" };
-  } catch { return { fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" }; }
+    return raw ? { host: "smtp.gmail.com", ...JSON.parse(raw) } : { host: "smtp.gmail.com", fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" };
+  } catch { return { host: "smtp.gmail.com", fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" }; }
 }
 
 const ROLES = [
@@ -198,6 +198,7 @@ export default function AuditPage() {
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "ok" | "fail">("idle");
   const [smtpSaved, setSmtpSaved] = useState(false);
   const [pwError, setPwError] = useState("");
+  const [relayMessage, setRelayMessage] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -210,6 +211,7 @@ export default function AuditPage() {
           ...prev,
           fromEmail: config.fromEmail || prev.fromEmail,
           fromName: config.fromName || prev.fromName,
+          host: config.host || prev.host,
           appPassword: config.appPassword || prev.appPassword,
           port: config.port || prev.port,
         }));
@@ -221,12 +223,17 @@ export default function AuditPage() {
     setSmtp((prev: typeof smtp) => ({ ...prev, [key]: val }));
     setSmtpSaved(false);
     setTestStatus("idle");
+    setRelayMessage("");
     if (key === "appPassword") setPwError("");
   }
 
-  function testConnection() {
+  async function testConnection() {
     const cleaned = smtp.appPassword.replace(/\s/g, "");
-    if (!smtp.fromEmail) { setTestStatus("fail"); return; }
+    if (!smtp.host || !smtp.fromEmail) {
+      setRelayMessage("SMTP host and Gmail address are required.");
+      setTestStatus("fail");
+      return;
+    }
     if (cleaned.length !== 16) {
       setPwError("Gmail app passwords are exactly 16 characters.");
       setTestStatus("fail");
@@ -234,11 +241,30 @@ export default function AuditPage() {
     }
     setPwError("");
     setTestStatus("testing");
-    // Real SMTP test requires a server-side call; flag as not yet wired
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/smtp/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          host: smtp.host,
+          port: smtp.port,
+          fromEmail: smtp.fromEmail,
+          username: smtp.fromEmail,
+          appPassword: smtp.appPassword,
+        }),
+      });
+      const status = await res.json();
+      if (!res.ok || !status.ok) {
+        setTestStatus("fail");
+        setRelayMessage(status.error || "SMTP relay did not answer.");
+        return;
+      }
+      setTestStatus("ok");
+      setRelayMessage(status.tls ? "Relay is reachable and advertises TLS." : "Relay is reachable.");
+    } catch {
       setTestStatus("fail");
-      setPwError("Live connection test requires the backend SMTP relay to be running.");
-    }, 1200);
+      setRelayMessage("Could not reach the SMTP relay from the server.");
+    }
   }
 
   function saveSmtp() {
@@ -504,6 +530,14 @@ export default function AuditPage() {
           </div>
           <div className="form-grid">
             <label>
+              SMTP host
+              <input
+                placeholder="smtp.gmail.com"
+                value={smtp.host}
+                onChange={(e) => handleSmtpChange("host", e.target.value)}
+              />
+            </label>
+            <label>
               Gmail address (from / username)
               <input
                 type="email"
@@ -539,10 +573,17 @@ export default function AuditPage() {
             </label>
           </div>
           <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10, marginBottom: 0 }}>
-            Host: smtp.gmail.com · Use a Gmail App Password, not your account password. Generate one at myaccount.google.com → Security → App passwords.
+            Use a Gmail App Password, not your account password. Generate one at myaccount.google.com → Security → App passwords.
           </p>
+          {relayMessage && (
+            <p style={{ color: testStatus === "ok" ? "var(--green)" : "var(--ldc-red)", fontSize: 12, marginTop: 8 }}>
+              {relayMessage}
+            </p>
+          )}
           <div className="confirm-actions">
-            <button onClick={testConnection} type="button">Test Connection</button>
+            <button disabled={testStatus === "testing"} onClick={() => void testConnection()} type="button">
+              {testStatus === "testing" ? "Checking Relay..." : "Check Relay"}
+            </button>
             <button className="primary" onClick={saveSmtp} type="button">Save</button>
           </div>
         </div>

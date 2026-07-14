@@ -200,6 +200,8 @@ You can also clear browser-side console data inside the site:
 
 Use the same `Data Management` panel to import participant CSV files. Export Excel or Google Sheets files as CSV first.
 
+To confirm email delivery can reach Gmail, open `Audit`, find `SMTP - Gmail`, and click `Check Relay` after the SMTP fields are filled in. A green message means the server can reach the SMTP relay.
+
 If you want to keep the sample session names but remove sample people, run:
 
 ```bash
@@ -265,6 +267,98 @@ http://localhost:3000
 ```
 
 If your helper set up system services instead, they may give you a different startup command.
+
+## Domain Name Setup
+
+Use this section if the chapter wants the site to open at a real web address, such as `example.org`, instead of only an IP address.
+
+You will need:
+
+- Access to the AWS account where the LDC server is running.
+- Access to the domain's DNS settings. This is probably Wix.
+- The exact domain name, such as `example.org`.
+- A technical helper for the Nginx and HTTPS certificate steps.
+
+### Step 1: Create The Permanent AWS IP Address
+
+AWS calls this an Elastic IP. It is a permanent public IP address for the server.
+
+In AWS:
+
+1. Open the AWS Console.
+2. Go to `EC2`.
+3. Make sure you are in the same AWS region as the LDC server.
+4. In the left menu, click `Elastic IPs`.
+5. Click `Allocate Elastic IP address`.
+6. Keep the normal Amazon IPv4 option.
+7. Click `Allocate`.
+8. Select the new Elastic IP.
+9. Click `Actions`.
+10. Click `Associate Elastic IP address`.
+11. Choose the LDC EC2 instance.
+12. Click `Associate`.
+
+Write down the Elastic IP address. It will look like four numbers separated by dots.
+
+Important: do not leave an Elastic IP unattached. AWS can charge for unused Elastic IPs.
+
+### Step 2: Make Sure The Server Allows Website Traffic
+
+In AWS, open the security group for the LDC server. The inbound rules should allow:
+
+| Type | Port | Source |
+| --- | --- | --- |
+| HTTP | `80` | Anywhere |
+| HTTPS | `443` | Anywhere |
+| SSH | `22` | Only the helper's IP address |
+
+Do not open PostgreSQL to the internet.
+
+Before changing Wix, ask the helper to check:
+
+```bash
+curl -I http://ELASTIC_IP_ADDRESS
+```
+
+Replace `ELASTIC_IP_ADDRESS` with the real Elastic IP.
+
+### Step 3: Point The Wix Domain To AWS
+
+In Wix:
+
+1. Log in to Wix.
+2. Go to `Domains`.
+3. Find the chapter domain.
+4. Open the domain's `Domain Actions` menu.
+5. Click `Manage DNS Records`.
+6. Find the `A` record for the main domain. It may say `@`.
+7. Change that `A` record to the AWS Elastic IP.
+8. Add or update `www`:
+   - Use a `CNAME` record named `www` pointing to the main domain, if Wix allows it.
+   - Otherwise, use an `A` record named `www` pointing to the same Elastic IP.
+9. Save the changes.
+
+The records should look roughly like this:
+
+| Host | Type | Points To |
+| --- | --- | --- |
+| `@` | `A` | AWS Elastic IP |
+| `www` | `CNAME` | Main domain |
+
+DNS changes may work quickly, or they may take 24-48 hours.
+
+### Step 4: Finish HTTPS
+
+After Wix points to AWS, the technical helper needs to configure Nginx and HTTPS on the server.
+
+They should make sure:
+
+- The Nginx `server_name` includes both the main domain and `www`.
+- Nginx sends website traffic to the LDC frontend service.
+- HTTPS certificates are installed for both names.
+- Both `https://example.org` and `https://www.example.org` load the site.
+
+Do not announce the site as ready until HTTPS works.
 
 ## Make A Backup Before Big Changes
 

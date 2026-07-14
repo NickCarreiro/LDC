@@ -353,7 +353,7 @@ Recommended chapter setup flow:
 5. Use `Matching Workbench` to score possible pairs and draft recommendations.
 6. Use `Curation Table` to review matchups and date history.
 7. Use `Draft Emails` to prepare communication drafts.
-8. Use `Audit` to review access/audit information, import CSVs, clear browser-side data, and manage local SMTP settings.
+8. Use `Audit` to review access/audit information, import CSVs, clear browser-side data, manage local SMTP settings, and check that the SMTP relay is reachable.
 
 Organizers remain responsible for final decisions. Scores and drafts are support tools.
 
@@ -375,6 +375,8 @@ Database cleanup and browser-side cleanup are separate:
 
 - Use `./scripts/clear-dummy-data.sh` for PostgreSQL records.
 - Use `Audit > Data Management` for browser-side console records.
+
+For email setup, use `Audit > SMTP - Gmail > Check Relay` after entering the SMTP host, Gmail address, port, and app password. The check runs from the server and confirms that the SMTP relay answers.
 
 ## Backups
 
@@ -417,6 +419,116 @@ curl -i http://127.0.0.1:3000/
 ```
 
 The frontend service should have a valid production `.next` build before `next start` runs.
+
+## Domain Name And Elastic IP Setup
+
+Use this when a chapter wants a real domain such as `example.org` or `www.example.org` to open the LDC site.
+
+Official references:
+
+- AWS Elastic IP documentation: `https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html`
+- AWS security group web-server rules: `https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html`
+- Wix DNS records guide: `https://support.wix.com/en/article/managing-dns-records-in-your-wix-account`
+- Wix A record guide: `https://support.wix.com/en/article/adding-or-updating-a-records-in-your-wix-account`
+
+### 1. Allocate And Attach An AWS Elastic IP
+
+The site should not depend on the EC2 instance's temporary public IP. In AWS:
+
+1. Open the AWS Console.
+2. Go to `EC2`.
+3. Make sure the region is the same region as the LDC server.
+4. In the left menu, open `Network & Security > Elastic IPs`.
+5. Click `Allocate Elastic IP address`.
+6. Use Amazon's IPv4 address pool unless the technical owner has a different requirement.
+7. Click `Allocate`.
+8. Select the new Elastic IP.
+9. Choose `Actions > Associate Elastic IP address`.
+10. Resource type: `Instance`.
+11. Select the LDC EC2 instance.
+12. Select the private IP shown for that instance.
+13. Click `Associate`.
+
+Copy the allocated Elastic IP address. This is the public IP the domain will point to.
+
+Important: AWS can charge for unused or unattached Elastic IP addresses. Keep the Elastic IP associated with the running instance, or release it when the server is permanently retired.
+
+### 2. Open Web Traffic In The EC2 Security Group
+
+In AWS, open the security group attached to the LDC EC2 instance and confirm these inbound rules:
+
+| Type | Protocol | Port | Source |
+| --- | --- | --- | --- |
+| HTTP | TCP | `80` | `0.0.0.0/0` |
+| HTTPS | TCP | `443` | `0.0.0.0/0` |
+| SSH | TCP | `22` | The technical helper's IP only, not `0.0.0.0/0` |
+
+Do not expose PostgreSQL (`5432` or `5433`) to the internet.
+
+Before touching DNS, verify the Elastic IP reaches the server:
+
+```bash
+curl -I http://ELASTIC_IP_ADDRESS
+```
+
+The response should come from Nginx or the app server. If it times out, fix AWS security group, Nginx, or service health before changing Wix DNS.
+
+### 3. Point The Wix Domain To The Elastic IP
+
+In Wix:
+
+1. Log in to the Wix account that owns the domain.
+2. Go to `Domains`.
+3. Click the domain's `Domain Actions` menu.
+4. Choose `Manage DNS Records`.
+5. Find the `A` record for the root domain. This may be shown as `@`, the bare domain, or the domain name itself.
+6. Edit that `A` record so it points to the AWS Elastic IP.
+7. Add or edit `www`:
+   - Preferred: add a `CNAME` record with host `www` pointing to the root domain, such as `example.org`.
+   - If Wix does not allow that for this domain, add an `A` record with host `www` pointing to the same Elastic IP.
+8. Remove old/conflicting Wix default A records only after confirming they are for the same root or `www` host.
+9. Save the DNS changes.
+
+Typical records:
+
+| Host | Type | Value |
+| --- | --- | --- |
+| `@` | `A` | The AWS Elastic IP |
+| `www` | `CNAME` | The root domain, for example `example.org` |
+
+DNS can update in minutes, but it can also take up to 24-48 hours depending on resolver caches.
+
+### 4. Configure The Server Domain
+
+On the server, Nginx should accept the new domain and proxy traffic to the frontend service on port `3001`.
+
+Typical Nginx values:
+
+```nginx
+server_name example.org www.example.org;
+proxy_pass http://127.0.0.1:3001;
+```
+
+The app environment should use the public domain:
+
+```text
+BACKEND_CORS_ORIGINS=https://example.org
+NEXT_PUBLIC_API_BASE_URL=https://example.org
+```
+
+After DNS points to the Elastic IP, the technical helper should install or renew HTTPS certificates for the domain, usually with Certbot/Nginx. Do not mark the handoff complete until `https://example.org` and `https://www.example.org` both load correctly.
+
+Verification commands:
+
+```bash
+dig +short example.org
+dig +short www.example.org
+curl -I http://example.org
+curl -I https://example.org
+systemctl status ldc-frontend.service --no-pager
+```
+
+The `dig` output should show the Elastic IP for the root domain. `www` may show either the Elastic IP or a CNAME that resolves to it.
 
 ## Troubleshooting
 
