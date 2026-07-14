@@ -206,6 +206,8 @@ Some older date-history answers are messy free text. The site preserves them and
 
 After import, `Generate Recommendations` works with the imported men and women. The site understands both `Male/Female` and `Man/Woman` labels.
 
+Generated draft emails list each approved date with that date's phone number. If a participant has no phone number on file, the draft says `phone not listed` so the operator can fix the participant record before sending.
+
 To confirm email delivery can reach Gmail, open `Audit`, find `SMTP - Gmail`, and click `Check Relay` after the SMTP fields are filled in. A green message means the server can reach the SMTP relay.
 
 If you want to keep the sample session names but remove sample people, run:

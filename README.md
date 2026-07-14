@@ -355,6 +355,8 @@ Recommended chapter setup flow:
 7. Use `Draft Emails` to prepare communication drafts.
 8. Use `Audit` to review access/audit information, import CSV/XLSX files, clear browser-side data, manage local SMTP settings, and check that the SMTP relay is reachable.
 
+Draft emails list each approved date with that date's phone number. If a participant has no phone number on file, the draft says `phone not listed` so the operator can fix it before sending.
+
 Organizers remain responsible for final decisions. Scores and drafts are support tools.
 
 ## In-App Data Management

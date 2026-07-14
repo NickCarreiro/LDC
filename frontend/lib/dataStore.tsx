@@ -13,6 +13,7 @@ import {
   type Session,
   type SessionDisplayName,
 } from "./operationsData";
+import { buildParticipantDateEmail, type DateEmailPartner } from "./emailDrafts";
 import { participantGenderRole } from "./operationsData";
 import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
@@ -365,7 +366,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Collect all matches per participant
     // Partners are shown by session display name only (e.g. "Mary 1") for privacy
     const sessionId = "Summer 2026";
-    const matchesForParticipant: Record<string, { id: string; name: string; firstName: string; partners: { name: string; phone: string }[] }> = {};
+    const matchesForParticipant: Record<string, { id: string; name: string; firstName: string; partners: DateEmailPartner[] }> = {};
     for (const draft of approvedDrafts) {
       const pA = draft.participantAId ? participants.find((p) => p.id === draft.participantAId) : participants.find((p) => p.name === draft.pair.split(" + ")[0]);
       const pB = draft.participantBId ? participants.find((p) => p.id === draft.participantBId) : participants.find((p) => p.name === draft.pair.split(" + ")[1]);
@@ -379,24 +380,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Generate one email per participant (don't overwrite manually edited ones)
     for (const { id, firstName, partners } of Object.values(matchesForParticipant)) {
       if (emailMap[id]?.status === "sent") continue; // don't regenerate if already sent
-      const dateList = partners
-        .map((partner, i) => `${i + 1}. ${partner.name} - ${partner.phone.trim() || "phone not listed"}`)
-        .join("\n");
+      const { subject, body } = buildParticipantDateEmail(firstName, partners);
       emailMap[id] = {
-        subject: "Your curated dates — Summer 2026",
-        body: [
-          `Hello ${firstName},`,
-          "",
-          "The organizing team has finalized your date assignments for the Summer 2026 session.",
-          "",
-          `Your date${partners.length > 1 ? "s" : ""}:`,
-          dateList,
-          "",
-          "Please follow the event instructions from the organizers for each date and reach out with any questions before meeting.",
-          "",
-          "With care,",
-          "The Little Dates Club Organizing Team",
-        ].join("\n"),
+        subject,
+        body,
         status: "draft",
       };
     }

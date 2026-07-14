@@ -3,7 +3,7 @@ from app.models.operations import MatchDraft, Participant
 
 def build_match_email(match: MatchDraft, participant: Participant, counterpart: Participant) -> tuple[str, str]:
     subject = "Your curated date information"
-    counterpart_phone = counterpart.phone or "phone not listed"
+    counterpart_phone = (counterpart.phone or "").strip() or "phone not listed"
     body = (
         f"Hello {participant.first_name},\n\n"
         "The organizing team has prepared your date information for the upcoming session.\n\n"
