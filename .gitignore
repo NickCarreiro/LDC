@@ -19,6 +19,7 @@ backend/.ruff_cache/
 .env
 .env.local
 .env.production
+.local/
 
 # OS
 .DS_Store

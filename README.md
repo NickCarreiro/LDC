@@ -28,6 +28,19 @@ Useful local URLs:
 
 `./scripts/generate-test-people.sh` loads an idempotent synthetic batch of at least 250 participants, vision statements, registrations, date history, and match drafts for local testing.
 
+## Database Operations
+
+See [docs/database-operations.md](docs/database-operations.md) for database access, pgAdmin viewer setup, dummy-data cleanup, and chapter session setup.
+
+Common commands:
+
+```bash
+./scripts/setup-db-viewer.sh
+./scripts/clear-dummy-data.sh          # dry run
+./scripts/clear-dummy-data.sh --yes
+./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12 --location "Parish Hall" --registration-open --attach-default-intake
+```
+
 ## Development Phases
 
 ### Phase 1: Operations Foundation
