@@ -6,13 +6,13 @@ import { useMemo, useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
-import { describeConflicts, scoreParticipants, type MatchDraft } from "../../lib/operationsData";
+import { describeConflicts, participantGenderRole, scoreParticipants, type MatchDraft } from "../../lib/operationsData";
 import { ALL_THEMES, THEME_LABELS, extractThemeProfile } from "../../lib/visionWeights";
 
 export default function MatchingPage() {
   const { participants, matchDrafts, addMatchDraft, removeDraft, updateDraftStatus, keywords, addKeyword, updateKeyword, removeKeyword } = useStore();
-  const women = participants.filter((p) => p.gender === "Woman");
-  const men = participants.filter((p) => p.gender === "Man");
+  const women = participants.filter((p) => participantGenderRole(p.gender) === "woman");
+  const men = participants.filter((p) => participantGenderRole(p.gender) === "man");
   const [primary, setPrimary] = useState(women[0]?.id ?? "");
   const [secondary, setSecondary] = useState(men[0]?.id ?? "");
 

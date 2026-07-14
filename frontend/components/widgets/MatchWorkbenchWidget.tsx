@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 
 import { useStore } from "../../lib/dataStore";
-import { describeConflicts, scoreParticipants } from "../../lib/operationsData";
+import { describeConflicts, participantGenderRole, scoreParticipants } from "../../lib/operationsData";
 
 export function MatchWorkbenchWidget() {
   const { participants, keywords } = useStore();
-  const women = participants.filter((p) => p.gender === "Woman");
-  const men = participants.filter((p) => p.gender === "Man");
+  const women = participants.filter((p) => participantGenderRole(p.gender) === "woman");
+  const men = participants.filter((p) => participantGenderRole(p.gender) === "man");
   const [primary, setPrimary] = useState(women[0]?.id ?? "");
   const [secondary, setSecondary] = useState(men[0]?.id ?? "");
 

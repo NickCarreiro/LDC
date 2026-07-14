@@ -157,6 +157,13 @@ function lastName(name: string) {
   return name.split(" ").slice(1).join(" ").trim(); // everything after first name
 }
 
+export function participantGenderRole(gender: string): "woman" | "man" | "unknown" {
+  const normalized = gender.toLowerCase().trim();
+  if (["woman", "female", "women", "f"].includes(normalized)) return "woman";
+  if (["man", "male", "men", "m"].includes(normalized)) return "man";
+  return "unknown";
+}
+
 export function scoreParticipants(
   a: Participant,
   b: Participant,
@@ -166,7 +173,10 @@ export function scoreParticipants(
   const sharedVision = a.visionTags.filter((tag) => b.visionTags.includes(tag));
   const priorDate = a.previousDates.includes(b.name) || b.previousDates.includes(a.name);
   const sharesLastName = lastName(a.name) !== "" && lastName(a.name) === lastName(b.name);
-  const blocked = a.cannotDate.includes(b.name) || b.cannotDate.includes(a.name) || sharesLastName;
+  const sameKnownGender =
+    participantGenderRole(a.gender) !== "unknown" &&
+    participantGenderRole(a.gender) === participantGenderRole(b.gender);
+  const blocked = a.cannotDate.includes(b.name) || b.cannotDate.includes(a.name) || sharesLastName || sameKnownGender;
 
   // Vision text analysis (0-20 bonus, zero if no keywords configured)
   let profileA: ThemeProfile = {};
@@ -211,13 +221,22 @@ export function describeConflicts(a: Participant, b: Participant): ConflictDescr
   // Shared last name — always a hard block
   const lnA = lastName(a.name);
   const lnB = lastName(b.name);
+  const roleA = participantGenderRole(a.gender);
+  const roleB = participantGenderRole(b.gender);
+  if (roleA !== "unknown" && roleA === roleB) {
+    out.push({
+      label: "Same gender",
+      detail: `${a.name} and ${b.name} are both listed as ${roleA === "woman" ? "women" : "men"}.`,
+      severity: "block",
+    });
+  }
   if (lnA && lnA === lnB) {
     out.push({
       label: "Shared surname",
       detail: `${a.name} and ${b.name} share the surname "${lnA}" — likely family.`,
       severity: "block",
     });
-    return out; // no need to enumerate other conflicts on top of this
+    return out;
   }
 
   const aBlocksB = a.cannotDate.includes(b.name);

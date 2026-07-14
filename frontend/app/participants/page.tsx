@@ -8,6 +8,7 @@ import { ActionButton } from "../../components/ActionButton";
 import { AppShell } from "../../components/AppShell";
 import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
+import { participantGenderRole } from "../../lib/operationsData";
 
 const STATUS_OPTIONS = ["Accepted", "Fee pending", "Waitlisted", "Declined", "Withdrawn"];
 const FEE_OPTIONS = ["paid", "pending", "waived"];
@@ -34,7 +35,9 @@ export default function ParticipantsPage() {
     })
     .sort((a, b) => {
       if (sortMode === "gender-age") {
-        if (a.gender !== b.gender) return a.gender === "Woman" ? -1 : 1;
+        const roleA = participantGenderRole(a.gender);
+        const roleB = participantGenderRole(b.gender);
+        if (roleA !== roleB) return roleA === "woman" ? -1 : 1;
         return a.age - b.age;
       }
       return a.name.localeCompare(b.name);
@@ -254,7 +257,7 @@ export default function ParticipantsPage() {
       )}
 
       <section className="status-strip">
-        <div className="status-card"><span>Total</span><strong>{participants.length}</strong><small>{participants.filter(p => p.gender === "Woman").length}w / {participants.filter(p => p.gender === "Man").length}m</small></div>
+        <div className="status-card"><span>Total</span><strong>{participants.length}</strong><small>{participants.filter(p => participantGenderRole(p.gender) === "woman").length}w / {participants.filter(p => participantGenderRole(p.gender) === "man").length}m</small></div>
         <div className="status-card"><span>Accepted</span><strong>{participants.filter((p) => p.status === "Accepted").length}</strong><small>Summer 2026</small></div>
         <div className="status-card important"><span>Fee pending</span><strong>{participants.filter((p) => p.fee === "pending").length}</strong><small>need confirmation</small></div>
         <div className="status-card"><span>Special needs flag</span><strong>{participants.filter((p) => p.special).length}</strong><small>max 1 date of this type per woman</small></div>

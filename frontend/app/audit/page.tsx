@@ -7,6 +7,7 @@ import { AppShell } from "../../components/AppShell";
 import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
 import { parseParticipantImportFile, type ImportParticipantRow } from "../../lib/importParticipants";
+import { participantGenderRole } from "../../lib/operationsData";
 
 function loadSmtp() {
   if (typeof window === "undefined") return { host: "smtp.gmail.com", fromEmail: "", fromName: "Little Dates Club", appPassword: "", port: "587" };
@@ -179,8 +180,8 @@ export default function AuditPage() {
 
   function ensureImportSession() {
     if (!importSession || sessions.some((session) => session.name === importSession)) return false;
-    const men = importRows.filter((row) => /^(male|man)$/i.test(row.gender)).length;
-    const women = importRows.filter((row) => /^(female|woman)$/i.test(row.gender)).length;
+    const men = importRows.filter((row) => participantGenderRole(row.gender) === "man").length;
+    const women = importRows.filter((row) => participantGenderRole(row.gender) === "woman").length;
     addSession({
       id: `import-session-${importSession.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${Date.now()}`,
       name: importSession,

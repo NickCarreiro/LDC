@@ -204,6 +204,8 @@ The site also tries to detect the session from the file name. For example, a wor
 
 Some older date-history answers are messy free text. The site preserves them and marks them `Review manually` when they do not exactly match a current participant name.
 
+After import, `Generate Recommendations` works with the imported men and women. The site understands both `Male/Female` and `Man/Woman` labels.
+
 To confirm email delivery can reach Gmail, open `Audit`, find `SMTP - Gmail`, and click `Check Relay` after the SMTP fields are filled in. A green message means the server can reach the SMTP relay.
 
 If you want to keep the sample session names but remove sample people, run:

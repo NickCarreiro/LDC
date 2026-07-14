@@ -7,6 +7,7 @@ import { useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { Modal } from "../../components/Modal";
 import { useStore } from "../../lib/dataStore";
+import { participantGenderRole } from "../../lib/operationsData";
 
 const WORKFLOW_STAGES = [
   { status: "Received", description: "Signup submitted; not yet reviewed by an organizer." },
@@ -165,11 +166,11 @@ export default function SessionsPage() {
         const names = sessionDisplayNames[current.id] ?? [];
         const menNames = names.filter((n) => {
           const p = participants.find((x) => x.id === n.participantId);
-          return p?.gender === "M";
+          return p ? participantGenderRole(p.gender) === "man" : false;
         });
         const womenNames = names.filter((n) => {
           const p = participants.find((x) => x.id === n.participantId);
-          return p?.gender === "F";
+          return p ? participantGenderRole(p.gender) === "woman" : false;
         });
         const duplicated = names.filter((n) => n.displayName !== n.firstName);
         return (

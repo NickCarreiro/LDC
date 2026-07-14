@@ -13,6 +13,7 @@ import {
   type Session,
   type SessionDisplayName,
 } from "./operationsData";
+import { participantGenderRole } from "./operationsData";
 import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
@@ -301,7 +302,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     // Block same-gender or shared last name (family)
     if (pA && pB) {
-      if (pA.gender === pB.gender) return;
+      const roleA = participantGenderRole(pA.gender);
+      const roleB = participantGenderRole(pB.gender);
+      if (roleA !== "unknown" && roleA === roleB) return;
       const lnA = pA.name.split(" ").slice(1).join(" ").trim();
       const lnB = pB.name.split(" ").slice(1).join(" ").trim();
       if (lnA && lnA === lnB) return;

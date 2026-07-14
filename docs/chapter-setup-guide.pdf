@@ -145,7 +145,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 3326 >>
+<< /Length 3393 >>
 stream
 BT /F3 9 Tf 54 738 Td (./scripts/clear-dummy-data.sh) Tj ET
 BT /F1 10 Tf 54 710 Td (Read the numbers it prints. This command does not delete anything.) Tj ET
@@ -173,193 +173,195 @@ BT /F1 10 Tf 54 353 Td (  Import Previewed Rows.) Tj ET
 BT /F1 10 Tf 54 332 Td (Some older date-history answers are messy free text. The site preserves them and) Tj ET
 BT /F1 10 Tf 54 318 Td (  marks them Review manually when they do not exactly match a current participant) Tj ET
 BT /F1 10 Tf 54 304 Td (  name.) Tj ET
-BT /F1 10 Tf 54 283 Td (To confirm email delivery can reach Gmail, open Audit, find SMTP - Gmail, and) Tj ET
-BT /F1 10 Tf 54 269 Td (  click Check Relay after the SMTP fields are filled in. A green message means the) Tj ET
-BT /F1 10 Tf 54 255 Td (  server can reach the SMTP relay.) Tj ET
-BT /F1 10 Tf 54 234 Td (If you want to keep the sample session names but remove sample people, run:) Tj ET
-BT /F3 9 Tf 54 213 Td (./scripts/clear-dummy-data.sh --keep-generated-sessions --yes) Tj ET
-BT /F1 10 Tf 54 185 Td (If you are unsure, stop and ask your helper before using --yes.) Tj ET
-BT /F1 10 Tf 54 164 Td (If the preview says it found zero demo records, but your helper wants a fully) Tj ET
-BT /F1 10 Tf 54 150 Td (  empty chapter database, run:) Tj ET
-BT /F3 9 Tf 54 129 Td (./scripts/clear-dummy-data.sh --all-operational-data) Tj ET
-BT /F1 10 Tf 54 101 Td (That is still only a preview. If your helper confirms the numbers and you have a) Tj ET
-BT /F1 10 Tf 54 87 Td (  backup, run:) Tj ET
-BT /F3 9 Tf 54 66 Td (./scripts/clear-dummy-data.sh --all-operational-data --yes) Tj ET
+BT /F1 10 Tf 54 283 Td (After import, Generate Recommendations works with the imported men and women. The) Tj ET
+BT /F1 10 Tf 54 269 Td (  site understands both Male/Female and Man/Woman labels.) Tj ET
+BT /F1 10 Tf 54 248 Td (To confirm email delivery can reach Gmail, open Audit, find SMTP - Gmail, and) Tj ET
+BT /F1 10 Tf 54 234 Td (  click Check Relay after the SMTP fields are filled in. A green message means the) Tj ET
+BT /F1 10 Tf 54 220 Td (  server can reach the SMTP relay.) Tj ET
+BT /F1 10 Tf 54 199 Td (If you want to keep the sample session names but remove sample people, run:) Tj ET
+BT /F3 9 Tf 54 178 Td (./scripts/clear-dummy-data.sh --keep-generated-sessions --yes) Tj ET
+BT /F1 10 Tf 54 150 Td (If you are unsure, stop and ask your helper before using --yes.) Tj ET
+BT /F1 10 Tf 54 129 Td (If the preview says it found zero demo records, but your helper wants a fully) Tj ET
+BT /F1 10 Tf 54 115 Td (  empty chapter database, run:) Tj ET
+BT /F3 9 Tf 54 94 Td (./scripts/clear-dummy-data.sh --all-operational-data) Tj ET
+BT /F1 10 Tf 54 66 Td (That is still only a preview. If your helper confirms the numbers and you have a) Tj ET
 endstream
 endobj
 12 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 2413 >>
+<< /Length 2298 >>
 stream
-BT /F2 13 Tf 54 726 Td (Create Your Chapter Session) Tj ET
-BT /F1 10 Tf 54 701 Td (Choose:) Tj ET
-BT /F1 10 Tf 54 680 Td (- A session name.) Tj ET
-BT /F1 10 Tf 54 666 Td (- A start date.) Tj ET
-BT /F1 10 Tf 54 652 Td (- A location label.) Tj ET
-BT /F1 10 Tf 54 638 Td (- Whether registration should be open now.) Tj ET
-BT /F1 10 Tf 54 617 Td (Example:) Tj ET
-BT /F3 9 Tf 54 596 Td (./scripts/create-session.sh \\) Tj ET
-BT /F3 9 Tf 54 582 Td (  --name "Fall 2026 - Your Chapter" \\) Tj ET
-BT /F3 9 Tf 54 568 Td (  --starts-on 2026-09-12 \\) Tj ET
-BT /F3 9 Tf 54 554 Td (  --location "Your Parish Hall" \\) Tj ET
-BT /F3 9 Tf 54 540 Td (  --registration-open \\) Tj ET
-BT /F3 9 Tf 54 526 Td (  --attach-default-intake) Tj ET
-BT /F1 10 Tf 54 498 Td (Replace:) Tj ET
-BT /F1 10 Tf 54 477 Td (- Fall 2026 - Your Chapter with your real session name.) Tj ET
-BT /F1 10 Tf 54 463 Td (- 2026-09-12 with your real date.) Tj ET
-BT /F1 10 Tf 54 449 Td (- Your Parish Hall with your real location.) Tj ET
-BT /F1 10 Tf 54 428 Td (If registration is not open yet, remove the --registration-open line.) Tj ET
-BT /F1 10 Tf 54 407 Td (To confirm the session exists, open pgAdmin and look in the program_sessions) Tj ET
-BT /F1 10 Tf 54 393 Td (  table.) Tj ET
-BT /F2 13 Tf 54 367 Td (Everyday Startup) Tj ET
-BT /F1 10 Tf 54 342 Td (If everything is already installed and you just need to start working, run:) Tj ET
-BT /F3 9 Tf 54 321 Td (./scripts/dev.sh) Tj ET
-BT /F1 10 Tf 54 293 Td (Then open:) Tj ET
-BT /F3 9 Tf 54 272 Td (http://localhost:3000) Tj ET
-BT /F1 10 Tf 54 244 Td (If your helper set up system services instead, they may give you a different) Tj ET
-BT /F1 10 Tf 54 230 Td (  startup command.) Tj ET
-BT /F2 13 Tf 54 204 Td (Domain Name Setup) Tj ET
-BT /F1 10 Tf 54 179 Td (Use this section if the chapter wants the site to open at a real web address, such) Tj ET
-BT /F1 10 Tf 54 165 Td (  as example.org, instead of only an IP address.) Tj ET
-BT /F1 10 Tf 54 144 Td (You will need:) Tj ET
-BT /F1 10 Tf 54 123 Td (- Access to the AWS account where the LDC server is running.) Tj ET
-BT /F1 10 Tf 54 109 Td (- Access to the domain's DNS settings. This is probably Wix.) Tj ET
-BT /F1 10 Tf 54 95 Td (- The exact domain name, such as example.org.) Tj ET
-BT /F1 10 Tf 54 81 Td (- A technical helper for the Nginx and HTTPS certificate steps.) Tj ET
-BT /F1 10 Tf 54 60 Td (### Step 1: Create The Permanent AWS IP Address) Tj ET
+BT /F1 10 Tf 54 738 Td (  backup, run:) Tj ET
+BT /F3 9 Tf 54 717 Td (./scripts/clear-dummy-data.sh --all-operational-data --yes) Tj ET
+BT /F2 13 Tf 54 684 Td (Create Your Chapter Session) Tj ET
+BT /F1 10 Tf 54 659 Td (Choose:) Tj ET
+BT /F1 10 Tf 54 638 Td (- A session name.) Tj ET
+BT /F1 10 Tf 54 624 Td (- A start date.) Tj ET
+BT /F1 10 Tf 54 610 Td (- A location label.) Tj ET
+BT /F1 10 Tf 54 596 Td (- Whether registration should be open now.) Tj ET
+BT /F1 10 Tf 54 575 Td (Example:) Tj ET
+BT /F3 9 Tf 54 554 Td (./scripts/create-session.sh \\) Tj ET
+BT /F3 9 Tf 54 540 Td (  --name "Fall 2026 - Your Chapter" \\) Tj ET
+BT /F3 9 Tf 54 526 Td (  --starts-on 2026-09-12 \\) Tj ET
+BT /F3 9 Tf 54 512 Td (  --location "Your Parish Hall" \\) Tj ET
+BT /F3 9 Tf 54 498 Td (  --registration-open \\) Tj ET
+BT /F3 9 Tf 54 484 Td (  --attach-default-intake) Tj ET
+BT /F1 10 Tf 54 456 Td (Replace:) Tj ET
+BT /F1 10 Tf 54 435 Td (- Fall 2026 - Your Chapter with your real session name.) Tj ET
+BT /F1 10 Tf 54 421 Td (- 2026-09-12 with your real date.) Tj ET
+BT /F1 10 Tf 54 407 Td (- Your Parish Hall with your real location.) Tj ET
+BT /F1 10 Tf 54 386 Td (If registration is not open yet, remove the --registration-open line.) Tj ET
+BT /F1 10 Tf 54 365 Td (To confirm the session exists, open pgAdmin and look in the program_sessions) Tj ET
+BT /F1 10 Tf 54 351 Td (  table.) Tj ET
+BT /F2 13 Tf 54 325 Td (Everyday Startup) Tj ET
+BT /F1 10 Tf 54 300 Td (If everything is already installed and you just need to start working, run:) Tj ET
+BT /F3 9 Tf 54 279 Td (./scripts/dev.sh) Tj ET
+BT /F1 10 Tf 54 251 Td (Then open:) Tj ET
+BT /F3 9 Tf 54 230 Td (http://localhost:3000) Tj ET
+BT /F1 10 Tf 54 202 Td (If your helper set up system services instead, they may give you a different) Tj ET
+BT /F1 10 Tf 54 188 Td (  startup command.) Tj ET
+BT /F2 13 Tf 54 162 Td (Domain Name Setup) Tj ET
+BT /F1 10 Tf 54 137 Td (Use this section if the chapter wants the site to open at a real web address, such) Tj ET
+BT /F1 10 Tf 54 123 Td (  as example.org, instead of only an IP address.) Tj ET
+BT /F1 10 Tf 54 102 Td (You will need:) Tj ET
+BT /F1 10 Tf 54 81 Td (- Access to the AWS account where the LDC server is running.) Tj ET
+BT /F1 10 Tf 54 67 Td (- Access to the domain's DNS settings. This is probably Wix.) Tj ET
 endstream
 endobj
 14 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 2865 >>
+<< /Length 2767 >>
 stream
-BT /F1 10 Tf 54 738 Td (AWS calls this an Elastic IP. It is a permanent public IP address for the server.) Tj ET
-BT /F1 10 Tf 54 717 Td (In AWS:) Tj ET
-BT /F1 10 Tf 54 696 Td (1. Open the AWS Console.) Tj ET
-BT /F1 10 Tf 54 682 Td (2. Go to EC2.) Tj ET
-BT /F1 10 Tf 54 668 Td (3. Make sure you are in the same AWS region as the LDC server.) Tj ET
-BT /F1 10 Tf 54 654 Td (4. In the left menu, click Elastic IPs.) Tj ET
-BT /F1 10 Tf 54 640 Td (5. Click Allocate Elastic IP address.) Tj ET
-BT /F1 10 Tf 54 626 Td (6. Keep the normal Amazon IPv4 option.) Tj ET
-BT /F1 10 Tf 54 612 Td (7. Click Allocate.) Tj ET
-BT /F1 10 Tf 54 598 Td (8. Select the new Elastic IP.) Tj ET
-BT /F1 10 Tf 54 584 Td (9. Click Actions.) Tj ET
-BT /F1 10 Tf 54 570 Td (10. Click Associate Elastic IP address.) Tj ET
-BT /F1 10 Tf 54 556 Td (11. Choose the LDC EC2 instance.) Tj ET
-BT /F1 10 Tf 54 542 Td (12. Click Associate.) Tj ET
-BT /F1 10 Tf 54 521 Td (Write down the Elastic IP address. It will look like four numbers separated by) Tj ET
-BT /F1 10 Tf 54 507 Td (  dots.) Tj ET
-BT /F1 10 Tf 54 486 Td (Important: do not leave an Elastic IP unattached. AWS can charge for unused) Tj ET
-BT /F1 10 Tf 54 472 Td (  Elastic IPs.) Tj ET
-BT /F1 10 Tf 54 451 Td (### Step 2: Make Sure The Server Allows Website Traffic) Tj ET
-BT /F1 10 Tf 54 430 Td (In AWS, open the security group for the LDC server. The inbound rules should) Tj ET
-BT /F1 10 Tf 54 416 Td (  allow:) Tj ET
-BT /F1 10 Tf 54 395 Td (| Type | Port | Source |) Tj ET
-BT /F1 10 Tf 54 381 Td (| --- | --- | --- |) Tj ET
-BT /F1 10 Tf 54 367 Td (| HTTP | 80 | Anywhere |) Tj ET
-BT /F1 10 Tf 54 353 Td (| HTTPS | 443 | Anywhere |) Tj ET
-BT /F1 10 Tf 54 339 Td (| SSH | 22 | Only the helper's IP address |) Tj ET
-BT /F1 10 Tf 54 318 Td (Do not open PostgreSQL to the internet.) Tj ET
-BT /F1 10 Tf 54 297 Td (Before changing Wix, ask the helper to check:) Tj ET
-BT /F3 9 Tf 54 276 Td (curl -I http://ELASTIC_IP_ADDRESS) Tj ET
-BT /F1 10 Tf 54 248 Td (Replace ELASTIC_IP_ADDRESS with the real Elastic IP.) Tj ET
-BT /F1 10 Tf 54 227 Td (### Step 3: Point The Wix Domain To AWS) Tj ET
-BT /F1 10 Tf 54 206 Td (In Wix:) Tj ET
-BT /F1 10 Tf 54 185 Td (1. Log in to Wix.) Tj ET
-BT /F1 10 Tf 54 171 Td (2. Go to Domains.) Tj ET
-BT /F1 10 Tf 54 157 Td (3. Find the chapter domain.) Tj ET
-BT /F1 10 Tf 54 143 Td (4. Open the domain's Domain Actions menu.) Tj ET
-BT /F1 10 Tf 54 129 Td (5. Click Manage DNS Records.) Tj ET
-BT /F1 10 Tf 54 115 Td (6. Find the A record for the main domain. It may say @.) Tj ET
-BT /F1 10 Tf 54 101 Td (7. Change that A record to the AWS Elastic IP.) Tj ET
-BT /F1 10 Tf 54 87 Td (8. Add or update www:) Tj ET
-BT /F1 10 Tf 54 73 Td (   - Use a CNAME record named www pointing to the main domain, if Wix allows it.) Tj ET
-BT /F1 10 Tf 54 59 Td (   - Otherwise, use an A record named www pointing to the same Elastic IP.) Tj ET
+BT /F1 10 Tf 54 738 Td (- The exact domain name, such as example.org.) Tj ET
+BT /F1 10 Tf 54 724 Td (- A technical helper for the Nginx and HTTPS certificate steps.) Tj ET
+BT /F1 10 Tf 54 703 Td (### Step 1: Create The Permanent AWS IP Address) Tj ET
+BT /F1 10 Tf 54 682 Td (AWS calls this an Elastic IP. It is a permanent public IP address for the server.) Tj ET
+BT /F1 10 Tf 54 661 Td (In AWS:) Tj ET
+BT /F1 10 Tf 54 640 Td (1. Open the AWS Console.) Tj ET
+BT /F1 10 Tf 54 626 Td (2. Go to EC2.) Tj ET
+BT /F1 10 Tf 54 612 Td (3. Make sure you are in the same AWS region as the LDC server.) Tj ET
+BT /F1 10 Tf 54 598 Td (4. In the left menu, click Elastic IPs.) Tj ET
+BT /F1 10 Tf 54 584 Td (5. Click Allocate Elastic IP address.) Tj ET
+BT /F1 10 Tf 54 570 Td (6. Keep the normal Amazon IPv4 option.) Tj ET
+BT /F1 10 Tf 54 556 Td (7. Click Allocate.) Tj ET
+BT /F1 10 Tf 54 542 Td (8. Select the new Elastic IP.) Tj ET
+BT /F1 10 Tf 54 528 Td (9. Click Actions.) Tj ET
+BT /F1 10 Tf 54 514 Td (10. Click Associate Elastic IP address.) Tj ET
+BT /F1 10 Tf 54 500 Td (11. Choose the LDC EC2 instance.) Tj ET
+BT /F1 10 Tf 54 486 Td (12. Click Associate.) Tj ET
+BT /F1 10 Tf 54 465 Td (Write down the Elastic IP address. It will look like four numbers separated by) Tj ET
+BT /F1 10 Tf 54 451 Td (  dots.) Tj ET
+BT /F1 10 Tf 54 430 Td (Important: do not leave an Elastic IP unattached. AWS can charge for unused) Tj ET
+BT /F1 10 Tf 54 416 Td (  Elastic IPs.) Tj ET
+BT /F1 10 Tf 54 395 Td (### Step 2: Make Sure The Server Allows Website Traffic) Tj ET
+BT /F1 10 Tf 54 374 Td (In AWS, open the security group for the LDC server. The inbound rules should) Tj ET
+BT /F1 10 Tf 54 360 Td (  allow:) Tj ET
+BT /F1 10 Tf 54 339 Td (| Type | Port | Source |) Tj ET
+BT /F1 10 Tf 54 325 Td (| --- | --- | --- |) Tj ET
+BT /F1 10 Tf 54 311 Td (| HTTP | 80 | Anywhere |) Tj ET
+BT /F1 10 Tf 54 297 Td (| HTTPS | 443 | Anywhere |) Tj ET
+BT /F1 10 Tf 54 283 Td (| SSH | 22 | Only the helper's IP address |) Tj ET
+BT /F1 10 Tf 54 262 Td (Do not open PostgreSQL to the internet.) Tj ET
+BT /F1 10 Tf 54 241 Td (Before changing Wix, ask the helper to check:) Tj ET
+BT /F3 9 Tf 54 220 Td (curl -I http://ELASTIC_IP_ADDRESS) Tj ET
+BT /F1 10 Tf 54 192 Td (Replace ELASTIC_IP_ADDRESS with the real Elastic IP.) Tj ET
+BT /F1 10 Tf 54 171 Td (### Step 3: Point The Wix Domain To AWS) Tj ET
+BT /F1 10 Tf 54 150 Td (In Wix:) Tj ET
+BT /F1 10 Tf 54 129 Td (1. Log in to Wix.) Tj ET
+BT /F1 10 Tf 54 115 Td (2. Go to Domains.) Tj ET
+BT /F1 10 Tf 54 101 Td (3. Find the chapter domain.) Tj ET
+BT /F1 10 Tf 54 87 Td (4. Open the domain's Domain Actions menu.) Tj ET
+BT /F1 10 Tf 54 73 Td (5. Click Manage DNS Records.) Tj ET
+BT /F1 10 Tf 54 59 Td (6. Find the A record for the main domain. It may say @.) Tj ET
 endstream
 endobj
 16 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 17 0 R >>
 endobj
 19 0 obj
-<< /Length 2557 >>
+<< /Length 2812 >>
 stream
-BT /F1 10 Tf 54 738 Td (9. Save the changes.) Tj ET
-BT /F1 10 Tf 54 717 Td (The records should look roughly like this:) Tj ET
-BT /F1 10 Tf 54 696 Td (| Host | Type | Points To |) Tj ET
-BT /F1 10 Tf 54 682 Td (| --- | --- | --- |) Tj ET
-BT /F1 10 Tf 54 668 Td (| @ | A | AWS Elastic IP |) Tj ET
-BT /F1 10 Tf 54 654 Td (| www | CNAME | Main domain |) Tj ET
-BT /F1 10 Tf 54 633 Td (DNS changes may work quickly, or they may take 24-48 hours.) Tj ET
-BT /F1 10 Tf 54 612 Td (### Step 4: Finish HTTPS) Tj ET
-BT /F1 10 Tf 54 591 Td (After Wix points to AWS, the technical helper needs to configure Nginx and HTTPS) Tj ET
-BT /F1 10 Tf 54 577 Td (  on the server.) Tj ET
-BT /F1 10 Tf 54 556 Td (They should make sure:) Tj ET
-BT /F1 10 Tf 54 535 Td (- The Nginx server_name includes both the main domain and www.) Tj ET
-BT /F1 10 Tf 54 521 Td (- Nginx sends website traffic to the LDC frontend service.) Tj ET
-BT /F1 10 Tf 54 507 Td (- HTTPS certificates are installed for both names.) Tj ET
-BT /F1 10 Tf 54 493 Td (- Both https://example.org and https://www.example.org load the site.) Tj ET
-BT /F1 10 Tf 54 472 Td (Do not announce the site as ready until HTTPS works.) Tj ET
-BT /F2 13 Tf 54 446 Td (Make A Backup Before Big Changes) Tj ET
-BT /F1 10 Tf 54 421 Td (Before deleting data, importing real participants, or changing session setup, make) Tj ET
-BT /F1 10 Tf 54 407 Td (  a backup:) Tj ET
-BT /F3 9 Tf 54 386 Td (pg_dump "postgresql://ldc:ldc_dev_password@localhost:5432/ldc" \\) Tj ET
-BT /F3 9 Tf 54 372 Td (  --format=custom \\) Tj ET
-BT /F3 9 Tf 54 358 Td (  --file "ldc-backup-$\(date +%Y%m%d%H%M%S\).dump") Tj ET
-BT /F1 10 Tf 54 330 Td (If your .env uses a different database password or port, ask your helper for the) Tj ET
-BT /F1 10 Tf 54 316 Td (  exact backup command.) Tj ET
-BT /F1 10 Tf 54 295 Td (Keep backups somewhere private. They may contain sensitive participant) Tj ET
-BT /F1 10 Tf 54 281 Td (  information.) Tj ET
-BT /F2 13 Tf 54 255 Td (What To Send Your Helper If Something Breaks) Tj ET
-BT /F1 10 Tf 54 230 Td (Send these four things:) Tj ET
-BT /F1 10 Tf 54 209 Td (1. What you were trying to do.) Tj ET
-BT /F1 10 Tf 54 195 Td (2. The command you ran.) Tj ET
-BT /F1 10 Tf 54 181 Td (3. The full error message.) Tj ET
-BT /F1 10 Tf 54 167 Td (4. A screenshot if the problem happened in the browser.) Tj ET
-BT /F1 10 Tf 54 146 Td (Do not send the .env file or database password in a group chat.) Tj ET
-BT /F2 13 Tf 54 120 Td (Common Problems) Tj ET
-BT /F1 10 Tf 54 95 Td (Problem: permission denied) Tj ET
-BT /F1 10 Tf 54 74 Td (Try:) Tj ET
+BT /F1 10 Tf 54 738 Td (7. Change that A record to the AWS Elastic IP.) Tj ET
+BT /F1 10 Tf 54 724 Td (8. Add or update www:) Tj ET
+BT /F1 10 Tf 54 710 Td (   - Use a CNAME record named www pointing to the main domain, if Wix allows it.) Tj ET
+BT /F1 10 Tf 54 696 Td (   - Otherwise, use an A record named www pointing to the same Elastic IP.) Tj ET
+BT /F1 10 Tf 54 682 Td (9. Save the changes.) Tj ET
+BT /F1 10 Tf 54 661 Td (The records should look roughly like this:) Tj ET
+BT /F1 10 Tf 54 640 Td (| Host | Type | Points To |) Tj ET
+BT /F1 10 Tf 54 626 Td (| --- | --- | --- |) Tj ET
+BT /F1 10 Tf 54 612 Td (| @ | A | AWS Elastic IP |) Tj ET
+BT /F1 10 Tf 54 598 Td (| www | CNAME | Main domain |) Tj ET
+BT /F1 10 Tf 54 577 Td (DNS changes may work quickly, or they may take 24-48 hours.) Tj ET
+BT /F1 10 Tf 54 556 Td (### Step 4: Finish HTTPS) Tj ET
+BT /F1 10 Tf 54 535 Td (After Wix points to AWS, the technical helper needs to configure Nginx and HTTPS) Tj ET
+BT /F1 10 Tf 54 521 Td (  on the server.) Tj ET
+BT /F1 10 Tf 54 500 Td (They should make sure:) Tj ET
+BT /F1 10 Tf 54 479 Td (- The Nginx server_name includes both the main domain and www.) Tj ET
+BT /F1 10 Tf 54 465 Td (- Nginx sends website traffic to the LDC frontend service.) Tj ET
+BT /F1 10 Tf 54 451 Td (- HTTPS certificates are installed for both names.) Tj ET
+BT /F1 10 Tf 54 437 Td (- Both https://example.org and https://www.example.org load the site.) Tj ET
+BT /F1 10 Tf 54 416 Td (Do not announce the site as ready until HTTPS works.) Tj ET
+BT /F2 13 Tf 54 390 Td (Make A Backup Before Big Changes) Tj ET
+BT /F1 10 Tf 54 365 Td (Before deleting data, importing real participants, or changing session setup, make) Tj ET
+BT /F1 10 Tf 54 351 Td (  a backup:) Tj ET
+BT /F3 9 Tf 54 330 Td (pg_dump "postgresql://ldc:ldc_dev_password@localhost:5432/ldc" \\) Tj ET
+BT /F3 9 Tf 54 316 Td (  --format=custom \\) Tj ET
+BT /F3 9 Tf 54 302 Td (  --file "ldc-backup-$\(date +%Y%m%d%H%M%S\).dump") Tj ET
+BT /F1 10 Tf 54 274 Td (If your .env uses a different database password or port, ask your helper for the) Tj ET
+BT /F1 10 Tf 54 260 Td (  exact backup command.) Tj ET
+BT /F1 10 Tf 54 239 Td (Keep backups somewhere private. They may contain sensitive participant) Tj ET
+BT /F1 10 Tf 54 225 Td (  information.) Tj ET
+BT /F2 13 Tf 54 199 Td (What To Send Your Helper If Something Breaks) Tj ET
+BT /F1 10 Tf 54 174 Td (Send these four things:) Tj ET
+BT /F1 10 Tf 54 153 Td (1. What you were trying to do.) Tj ET
+BT /F1 10 Tf 54 139 Td (2. The command you ran.) Tj ET
+BT /F1 10 Tf 54 125 Td (3. The full error message.) Tj ET
+BT /F1 10 Tf 54 111 Td (4. A screenshot if the problem happened in the browser.) Tj ET
+BT /F1 10 Tf 54 90 Td (Do not send the .env file or database password in a group chat.) Tj ET
+BT /F2 13 Tf 54 64 Td (Common Problems) Tj ET
 endstream
 endobj
 18 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 19 0 R >>
 endobj
 21 0 obj
-<< /Length 2156 >>
+<< /Length 2250 >>
 stream
-BT /F3 9 Tf 54 738 Td (chmod +x scripts/*.sh) Tj ET
-BT /F1 10 Tf 54 710 Td (Then run the command again.) Tj ET
-BT /F1 10 Tf 54 689 Td (Problem: database does not exist or connection refused) Tj ET
-BT /F1 10 Tf 54 668 Td (The database is not running or .env points to the wrong place. Send the error to) Tj ET
-BT /F1 10 Tf 54 654 Td (  your helper.) Tj ET
-BT /F1 10 Tf 54 633 Td (Problem: pgAdmin opens but cannot connect to LDC PostgreSQL) Tj ET
-BT /F1 10 Tf 54 612 Td (Run:) Tj ET
-BT /F3 9 Tf 54 591 Td (./scripts/setup-db-viewer.sh --replace) Tj ET
-BT /F1 10 Tf 54 563 Td (If it still fails, send your helper the error from pgAdmin.) Tj ET
-BT /F1 10 Tf 54 542 Td (Problem: The app still shows old sample people after clearing demo data) Tj ET
-BT /F1 10 Tf 54 521 Td (Try signing out and back in. If that does not work, clear the browser storage for) Tj ET
-BT /F1 10 Tf 54 507 Td (  localhost:3000 and reload the page.) Tj ET
-BT /F1 10 Tf 54 486 Td (Problem: You typed the wrong session name or date) Tj ET
-BT /F1 10 Tf 54 465 Td (Run create-session.sh again with the same session name and corrected details. The) Tj ET
-BT /F1 10 Tf 54 451 Td (  script updates an existing session when the name matches.) Tj ET
-BT /F2 13 Tf 54 425 Td (Safe Rules) Tj ET
-BT /F1 10 Tf 54 400 Td (- Do not delete real participant data without a backup.) Tj ET
-BT /F1 10 Tf 54 386 Td (- Do not share .env.) Tj ET
-BT /F1 10 Tf 54 372 Td (- Do not edit pgAdmin rows directly unless asked.) Tj ET
-BT /F1 10 Tf 54 358 Td (- Do not reuse demo sessions for a real chapter.) Tj ET
-BT /F1 10 Tf 54 344 Td (- When in doubt, stop and ask.) Tj ET
-BT /F2 13 Tf 54 318 Td (Quick Command List) Tj ET
-BT /F3 9 Tf 54 293 Td (git pull) Tj ET
-BT /F3 9 Tf 54 279 Td (./scripts/bootstrap.sh) Tj ET
-BT /F3 9 Tf 54 265 Td (./scripts/setup-db-viewer.sh) Tj ET
-BT /F3 9 Tf 54 251 Td (./scripts/clear-dummy-data.sh) Tj ET
-BT /F3 9 Tf 54 237 Td (./scripts/clear-dummy-data.sh --yes) Tj ET
-BT /F3 9 Tf 54 223 Td (./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12) Tj ET
-BT /F3 9 Tf 54 209 Td (--location "Parish Hall" --registration-open --attach-default-intake) Tj ET
+BT /F1 10 Tf 54 738 Td (Problem: permission denied) Tj ET
+BT /F1 10 Tf 54 717 Td (Try:) Tj ET
+BT /F3 9 Tf 54 696 Td (chmod +x scripts/*.sh) Tj ET
+BT /F1 10 Tf 54 668 Td (Then run the command again.) Tj ET
+BT /F1 10 Tf 54 647 Td (Problem: database does not exist or connection refused) Tj ET
+BT /F1 10 Tf 54 626 Td (The database is not running or .env points to the wrong place. Send the error to) Tj ET
+BT /F1 10 Tf 54 612 Td (  your helper.) Tj ET
+BT /F1 10 Tf 54 591 Td (Problem: pgAdmin opens but cannot connect to LDC PostgreSQL) Tj ET
+BT /F1 10 Tf 54 570 Td (Run:) Tj ET
+BT /F3 9 Tf 54 549 Td (./scripts/setup-db-viewer.sh --replace) Tj ET
+BT /F1 10 Tf 54 521 Td (If it still fails, send your helper the error from pgAdmin.) Tj ET
+BT /F1 10 Tf 54 500 Td (Problem: The app still shows old sample people after clearing demo data) Tj ET
+BT /F1 10 Tf 54 479 Td (Try signing out and back in. If that does not work, clear the browser storage for) Tj ET
+BT /F1 10 Tf 54 465 Td (  localhost:3000 and reload the page.) Tj ET
+BT /F1 10 Tf 54 444 Td (Problem: You typed the wrong session name or date) Tj ET
+BT /F1 10 Tf 54 423 Td (Run create-session.sh again with the same session name and corrected details. The) Tj ET
+BT /F1 10 Tf 54 409 Td (  script updates an existing session when the name matches.) Tj ET
+BT /F2 13 Tf 54 383 Td (Safe Rules) Tj ET
+BT /F1 10 Tf 54 358 Td (- Do not delete real participant data without a backup.) Tj ET
+BT /F1 10 Tf 54 344 Td (- Do not share .env.) Tj ET
+BT /F1 10 Tf 54 330 Td (- Do not edit pgAdmin rows directly unless asked.) Tj ET
+BT /F1 10 Tf 54 316 Td (- Do not reuse demo sessions for a real chapter.) Tj ET
+BT /F1 10 Tf 54 302 Td (- When in doubt, stop and ask.) Tj ET
+BT /F2 13 Tf 54 276 Td (Quick Command List) Tj ET
+BT /F3 9 Tf 54 251 Td (git pull) Tj ET
+BT /F3 9 Tf 54 237 Td (./scripts/bootstrap.sh) Tj ET
+BT /F3 9 Tf 54 223 Td (./scripts/setup-db-viewer.sh) Tj ET
+BT /F3 9 Tf 54 209 Td (./scripts/clear-dummy-data.sh) Tj ET
+BT /F3 9 Tf 54 195 Td (./scripts/clear-dummy-data.sh --yes) Tj ET
+BT /F3 9 Tf 54 181 Td (./scripts/create-session.sh --name "Fall 2026 - Chapter Name" --starts-on 2026-09-12) Tj ET
+BT /F3 9 Tf 54 167 Td (--location "Parish Hall" --registration-open --attach-default-intake) Tj ET
 endstream
 endobj
 20 0 obj
@@ -380,17 +382,17 @@ xref
 0000005841 00000 n 
 0000008205 00000 n 
 0000008353 00000 n 
-0000011732 00000 n 
-0000011880 00000 n 
-0000014346 00000 n 
-0000014494 00000 n 
-0000017412 00000 n 
-0000017560 00000 n 
-0000020170 00000 n 
-0000020318 00000 n 
-0000022527 00000 n 
+0000011799 00000 n 
+0000011947 00000 n 
+0000014298 00000 n 
+0000014446 00000 n 
+0000017266 00000 n 
+0000017414 00000 n 
+0000020279 00000 n 
+0000020427 00000 n 
+0000022730 00000 n 
 trailer
 << /Size 22 /Root 1 0 R >>
 startxref
-22675
+22878
 %%EOF

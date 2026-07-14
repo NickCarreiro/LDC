@@ -375,6 +375,8 @@ The importer also detects the session from the workbook filename or a session co
 
 Prior date history is imported conservatively. Clearly separated names become separate history entries. Messy free-text history is preserved for review and appears as `Review manually` unless it exactly matches a current participant name.
 
+Imported gender values such as `Male`/`Female` are normalized for the matching engine, so `Generate Recommendations` works with imported workbook data as well as native demo data.
+
 Database cleanup and browser-side cleanup are separate:
 
 - Use `./scripts/clear-dummy-data.sh` for PostgreSQL records.

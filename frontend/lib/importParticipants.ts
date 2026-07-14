@@ -246,6 +246,13 @@ function parseBoolean(value: string) {
   return undefined;
 }
 
+function normalizeImportedGender(value: string) {
+  const normalized = value.toLowerCase().trim();
+  if (["female", "woman", "women", "f"].includes(normalized)) return "Woman";
+  if (["male", "man", "men", "m"].includes(normalized)) return "Man";
+  return value;
+}
+
 function buildFeedback(row: SourceRow) {
   const parts = [
     ["Notes", pick(row, [
@@ -314,13 +321,13 @@ export function mapImportRows(rows: SourceRow[], fallbackSession: string): Impor
     return {
       firstName,
       lastName,
-      gender: pick(row, [
+      gender: normalizeImportedGender(pick(row, [
         { include: ["you are"], exact: true },
         { include: ["male female"] },
         { include: ["malefemale"], exact: true },
         { include: ["gender"] },
         { include: ["sex"], exact: true },
-      ]),
+      ])),
       age: parseAge(row),
       location,
       email: pick(row, [

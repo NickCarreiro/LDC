@@ -1,11 +1,12 @@
 "use client";
 
 import { useStore } from "../../lib/dataStore";
+import { participantGenderRole } from "../../lib/operationsData";
 
 export function StatusStatsWidget() {
   const { participants, matchDrafts } = useStore();
-  const women = participants.filter((p) => p.gender === "Woman");
-  const men = participants.filter((p) => p.gender === "Man");
+  const women = participants.filter((p) => participantGenderRole(p.gender) === "woman");
+  const men = participants.filter((p) => participantGenderRole(p.gender) === "man");
   const feePending = participants.filter((p) => p.fee === "pending" || p.status === "Fee pending");
   const draftMatches = matchDrafts.filter((d) => d.status === "Draft" || d.status === "Needs review");
   const emailsReady = matchDrafts.filter((d) => d.email === "Ready" && d.status === "Approved");
