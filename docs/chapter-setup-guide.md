@@ -1,6 +1,6 @@
-# LDC Chapter Operator Handoff Guide
+# LDC Chapter Setup Guide
 
-This guide is for a chapter operator who is not expected to be technical. Follow the steps in order. If something fails, stop and send the exact error message to the person helping you.
+This guide is for chapter operators setting up LDC for the first time. Follow the steps in order. If something fails, stop and send the exact error message to the person helping you.
 
 ## What You Are Setting Up
 
@@ -10,7 +10,7 @@ You are setting up three things:
 2. The PostgreSQL database, where the app stores records.
 3. pgAdmin, a database viewer that lets you inspect the database in a browser.
 
-You do not need to understand database internals to complete this setup. You only need to copy and run the commands exactly.
+You do not need to work inside the database for normal setup. Most steps are copy-and-run commands.
 
 ## Before You Start
 
@@ -171,6 +171,18 @@ If you want to keep the sample session names but remove sample people, run:
 
 If you are unsure, stop and ask your helper before using `--yes`.
 
+If the preview says it found zero demo records, but your helper wants a fully empty chapter database, run:
+
+```bash
+./scripts/clear-dummy-data.sh --all-operational-data
+```
+
+That is still only a preview. If your helper confirms the numbers and you have a backup, run:
+
+```bash
+./scripts/clear-dummy-data.sh --all-operational-data --yes
+```
+
 ## Create Your Chapter Session
 
 Choose:
@@ -268,7 +280,7 @@ Run:
 
 If it still fails, send your helper the error from pgAdmin.
 
-Problem: The app still shows old fake people after clearing dummy data
+Problem: The app still shows old sample people after clearing demo data
 
 Try signing out and back in. If that does not work, clear the browser storage for `localhost:3000` and reload the page.
 

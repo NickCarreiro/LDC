@@ -6,11 +6,13 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models.operations import (
+    AuditLog,
     DateHistory,
     MatchDraft,
     Participant,
     ProgramSession,
     SessionRegistration,
+    StaffUser,
     VisionStatementVersion,
 )
 
@@ -63,6 +65,13 @@ def _session_ids_by_name(db: Session, names: set[str]) -> list:
     return [row.id for row in rows]
 
 
+def select_all_operational_data(db: Session) -> DummySelection:
+    return DummySelection(
+        participant_ids=list(db.scalars(select(Participant.id)).all()),
+        session_ids=list(db.scalars(select(ProgramSession.id)).all()),
+    )
+
+
 def select_dummy_data(db: Session, include_generated_sessions: bool) -> DummySelection:
     participant_ids = [*_synthetic_participant_ids(db), *_small_seed_participant_ids(db)]
     session_names = set(SMALL_SEED_SESSIONS)
@@ -91,6 +100,8 @@ def summarize(db: Session, selection: DummySelection) -> dict[str, int]:
         "session_registrations": 0,
         "date_history": 0,
         "match_drafts": 0,
+        "audit_logs": 0,
+        "staff_users": 0,
     }
 
     if participant_ids:
@@ -133,7 +144,20 @@ def summarize(db: Session, selection: DummySelection) -> dict[str, int]:
     return summary
 
 
-def clear_dummy_data(db: Session, selection: DummySelection) -> None:
+def summarize_all_operational_data(db: Session) -> dict[str, int]:
+    return {
+        "participants": len(db.scalars(select(Participant.id)).all()),
+        "program_sessions": len(db.scalars(select(ProgramSession.id)).all()),
+        "vision_statement_versions": len(db.scalars(select(VisionStatementVersion.id)).all()),
+        "session_registrations": len(db.scalars(select(SessionRegistration.id)).all()),
+        "date_history": len(db.scalars(select(DateHistory.id)).all()),
+        "match_drafts": len(db.scalars(select(MatchDraft.id)).all()),
+        "audit_logs": len(db.scalars(select(AuditLog.id)).all()),
+        "staff_users": len(db.scalars(select(StaffUser.id)).all()),
+    }
+
+
+def clear_selected_data(db: Session, selection: DummySelection) -> None:
     participant_ids = selection.participant_ids
     session_ids = selection.session_ids
 
@@ -179,6 +203,17 @@ def clear_dummy_data(db: Session, selection: DummySelection) -> None:
         db.execute(delete(ProgramSession).where(ProgramSession.id.in_(session_ids)))
 
 
+def clear_all_operational_data(db: Session) -> None:
+    db.execute(delete(MatchDraft))
+    db.execute(delete(DateHistory))
+    db.execute(delete(SessionRegistration))
+    db.execute(delete(VisionStatementVersion))
+    db.execute(delete(AuditLog))
+    db.execute(delete(Participant))
+    db.execute(delete(ProgramSession))
+    db.execute(delete(StaffUser))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Remove local/demo data created by seed.py and generate_people.py."
@@ -199,25 +234,48 @@ def main() -> None:
             "deleted along with synthetic participants."
         ),
     )
+    parser.add_argument(
+        "--all-operational-data",
+        action="store_true",
+        help=(
+            "Select every operational table row, including real participants, sessions, "
+            "audit logs, and staff users. Use only after a backup."
+        ),
+    )
     args = parser.parse_args()
 
     with SessionLocal() as db:
-        selection = select_dummy_data(
-            db, include_generated_sessions=not args.keep_generated_sessions
-        )
-        summary = summarize(db, selection)
+        if args.all_operational_data:
+            selection = select_all_operational_data(db)
+            summary = summarize_all_operational_data(db)
+            label = "All operational data selected for cleanup:"
+        else:
+            selection = select_dummy_data(
+                db, include_generated_sessions=not args.keep_generated_sessions
+            )
+            summary = summarize(db, selection)
+            label = "Demo data selected for cleanup:"
 
-        print("Dummy data selected for cleanup:")
+        print(label)
         for table, count in summary.items():
             print(f"  {table}: {count}")
+
+        if not args.all_operational_data and not any(summary.values()):
+            print(
+                "\nNo known seed/synthetic demo records were found. If you need to wipe "
+                "a fresh chapter database, run a dry run with --all-operational-data."
+            )
 
         if not args.yes:
             print("\nDry run only. Re-run with --yes to delete these records.")
             return
 
-        clear_dummy_data(db, selection)
+        if args.all_operational_data:
+            clear_all_operational_data(db)
+        else:
+            clear_selected_data(db, selection)
         db.commit()
-        print("\nDummy data cleanup complete.")
+        print("\nCleanup complete.")
 
 
 if __name__ == "__main__":

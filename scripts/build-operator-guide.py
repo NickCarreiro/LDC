@@ -7,9 +7,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "docs" / "chapter-operator-handoff.md"
-PDF_OUT = ROOT / "docs" / "chapter-operator-handoff.pdf"
-ODT_OUT = ROOT / "docs" / "chapter-operator-handoff.odt"
+SOURCE = ROOT / "docs" / "chapter-setup-guide.md"
+PDF_OUT = ROOT / "docs" / "chapter-setup-guide.pdf"
+ODT_OUT = ROOT / "docs" / "chapter-setup-guide.odt"
 
 
 def read_markdown() -> list[str]:

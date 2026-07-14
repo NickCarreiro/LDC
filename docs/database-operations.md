@@ -193,6 +193,18 @@ Keep the generated `Summer 2026`, `Spring 2026`, and `Winter 2026` session shell
 ./scripts/clear-dummy-data.sh --keep-generated-sessions --yes
 ```
 
+If no known demo records are detected but this is a fresh chapter handoff and you intentionally want an empty operational database, preview a full cleanup:
+
+```bash
+./scripts/clear-dummy-data.sh --all-operational-data
+```
+
+Then delete all operational rows only after confirming the preview and making a backup:
+
+```bash
+./scripts/clear-dummy-data.sh --all-operational-data --yes
+```
+
 The script deletes dependent records in this order: match drafts, date history, registrations, vision statement versions, participants, then selected sessions.
 
 Do not run this against production unless you have confirmed the selection in dry-run output and have a backup.
