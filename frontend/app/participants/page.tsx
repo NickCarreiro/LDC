@@ -461,19 +461,24 @@ export default function ParticipantsPage() {
                   {/* Prior dating history */}
                   <div style={{ marginTop: 14 }}>
                     <p className="eyebrow" style={{ marginBottom: 8 }}>Prior date history</p>
-                    {!selected.previousDates.some((d) => d !== "new to the club") ? (
+                    {!selected.previousDates.some((d) => d.toLowerCase() !== "new to the club") ? (
                       <p style={{ fontSize: 13, color: "var(--muted)" }}>New to the club — no prior dates recorded.</p>
                     ) : (
                       <div className="check-list">
-                        {selected.previousDates.filter((d) => d !== "new to the club").map((name) => (
-                          <span key={name} style={{ justifyContent: "space-between" }}>
-                            <span>{name}</span>
-                            {selected.cannotDate.includes(name)
-                              ? <span className="status-pill warning" style={{ fontSize: 11 }}>Blocked — in cannot-date</span>
-                              : <span className="status-pill muted" style={{ fontSize: 11 }}>Eligible to repeat</span>
-                            }
-                          </span>
-                        ))}
+                        {selected.previousDates.filter((d) => d.toLowerCase() !== "new to the club").map((name) => {
+                          const matched = participants.some((participant) => participant.name === name);
+                          return (
+                            <span key={name} style={{ justifyContent: "space-between" }}>
+                              <span>{name}</span>
+                              {selected.cannotDate.includes(name)
+                                ? <span className="status-pill warning" style={{ fontSize: 11 }}>Blocked — in cannot-date</span>
+                                : matched
+                                ? <span className="status-pill muted" style={{ fontSize: 11 }}>Eligible to repeat</span>
+                                : <span className="status-pill warning" style={{ fontSize: 11 }}>Review manually</span>
+                              }
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

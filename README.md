@@ -373,6 +373,8 @@ Import accepts `.csv` and `.xlsx` files. For LDC signup workbooks, the importer 
 
 The importer also detects the session from the workbook filename or a session column. Examples: `Fall 2024`, `Spring 2025`, `DMV Spring 2026`, and `DMV Summer 2026`. The detected session appears in the `Import into session` dropdown before import. If that session does not already exist in the browser-side console data, `Import Previewed Rows` creates it automatically and sets the imported participants to that session. If the detected session is wrong, choose a different session in the dropdown before clicking import.
 
+Prior date history is imported conservatively. Clearly separated names become separate history entries. Messy free-text history is preserved for review and appears as `Review manually` unless it exactly matches a current participant name.
+
 Database cleanup and browser-side cleanup are separate:
 
 - Use `./scripts/clear-dummy-data.sh` for PostgreSQL records.

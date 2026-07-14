@@ -17,7 +17,7 @@ import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
-const SCHEMA_VERSION = "v10"; // bump when seed/import data shape changes to force a reset
+const SCHEMA_VERSION = "v11"; // bump when seed/import data shape changes to force a reset
 const LOAD_SAMPLE_DATA = process.env.NEXT_PUBLIC_LOAD_SAMPLE_DATA === "true";
 
 const initialParticipants = LOAD_SAMPLE_DATA ? seedParticipants : [];

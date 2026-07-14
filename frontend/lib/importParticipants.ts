@@ -190,8 +190,8 @@ function isBlankAnswer(value: string) {
 function splitPeopleList(value: string) {
   if (isBlankAnswer(value)) return [];
   return value
-    .split(/\s*(?:,|;|\n|\r|•|\u2022|\/|\band\b)\s*/gi)
-    .map((item) => item.trim().replace(/^[-–—]+/, "").trim())
+    .split(/\s*(?:,|;|\n|\r|•|\u2022|\/)\s*/g)
+    .map((item) => item.trim().replace(/^[-–—]+/, "").replace(/^(and|or)\s+/i, "").trim())
     .filter((item) => item && !isBlankAnswer(item));
 }
 

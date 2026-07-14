@@ -62,9 +62,9 @@ export default function MatchesPage() {
 
   // Build date history from previousDates across all participants
   const dateHistory = useMemo(() => {
-    const rows: { person: string; personGender: string; personLoc: string; date: string; cannotRepeat: boolean; blockedReason: string }[] = [];
+    const rows: { person: string; personGender: string; personLoc: string; date: string; cannotRepeat: boolean; blockedReason: string; matchedParticipant: boolean }[] = [];
     for (const p of participants) {
-      if (p.previousDates.every((d) => d === "new to the club")) continue;
+      if (p.previousDates.length === 0 || p.previousDates.every((d) => d.toLowerCase() === "new to the club")) continue;
       for (const d of p.previousDates) {
         const other = participants.find((x) => x.name === d);
         const pBlocksOther = p.cannotDate.includes(d);
@@ -74,7 +74,7 @@ export default function MatchesPage() {
           : pBlocksOther ? `${p.name} blocked`
           : otherBlocksP ? `${d} blocked`
           : "";
-        rows.push({ person: p.name, personGender: p.gender, personLoc: p.location, date: d, cannotRepeat, blockedReason });
+        rows.push({ person: p.name, personGender: p.gender, personLoc: p.location, date: d, cannotRepeat, blockedReason, matchedParticipant: Boolean(other) });
       }
     }
     return rows;
@@ -392,6 +392,8 @@ export default function MatchesPage() {
                 <span>
                   {row.cannotRepeat
                     ? <span className="status-pill warning" title={row.blockedReason}>Blocked — {row.blockedReason}</span>
+                    : !row.matchedParticipant
+                    ? <span className="status-pill warning" title="Imported history did not exactly match a current participant name">Review manually</span>
                     : <span className="status-pill">Eligible to repeat</span>
                   }
                 </span>
