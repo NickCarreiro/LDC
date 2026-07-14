@@ -200,6 +200,8 @@ You can also clear browser-side console data inside the site:
 
 Use the same `Data Management` panel to import participant CSV or Excel `.xlsx` files. For LDC signup workbooks, the importer uses the populated `Form Responses` sheet.
 
+The site also tries to detect the session from the file name. For example, a workbook named for `DMV Summer 2026` should show `DMV Summer 2026` in the `Import into session` dropdown. If the session does not already exist, importing creates it. If the dropdown shows the wrong session, choose the correct one before clicking `Import Previewed Rows`.
+
 To confirm email delivery can reach Gmail, open `Audit`, find `SMTP - Gmail`, and click `Check Relay` after the SMTP fields are filled in. A green message means the server can reach the SMTP relay.
 
 If you want to keep the sample session names but remove sample people, run:

@@ -52,6 +52,7 @@ export default function AuditPage() {
     sessions,
     participants,
     matchDrafts,
+    addSession,
     importParticipants,
     clearParticipantData,
     clearAllOperationalData,
@@ -64,6 +65,7 @@ export default function AuditPage() {
   const [importRows, setImportRows] = useState<ImportParticipantRow[]>([]);
   const [importHeaders, setImportHeaders] = useState<string[]>([]);
   const [importStatus, setImportStatus] = useState("");
+  const [detectedSessionName, setDetectedSessionName] = useState("");
 
   // SMTP config — loaded from localStorage, saved on explicit Save
   const [smtp, setSmtp] = useState(loadSmtp);
@@ -149,14 +151,20 @@ export default function AuditPage() {
     setImportStatus("");
     setImportRows([]);
     setImportHeaders([]);
+    setDetectedSessionName("");
     if (!file) return;
     try {
       const parsed = await parseParticipantImportFile(file, importSession);
+      if (parsed.detectedSessionName) {
+        setImportSession(parsed.detectedSessionName);
+        setDetectedSessionName(parsed.detectedSessionName);
+      }
       setImportHeaders(parsed.headers);
       setImportRows(parsed.rows);
       setImportStatus(
         `Parsed ${parsed.rawRowCount} row${parsed.rawRowCount === 1 ? "" : "s"}; ` +
         `mapped ${parsed.rows.length} participant${parsed.rows.length === 1 ? "" : "s"}` +
+        (parsed.detectedSessionName ? `; detected session ${parsed.detectedSessionName}` : "") +
         (parsed.skippedRowCount ? `; skipped ${parsed.skippedRowCount} blank/unusable row${parsed.skippedRowCount === 1 ? "" : "s"}.` : "."),
       );
     } catch (error) {
@@ -164,11 +172,34 @@ export default function AuditPage() {
     }
   }
 
+  function handleImportSessionChange(name: string) {
+    setImportSession(name);
+    setImportRows((rows) => rows.map((row) => ({ ...row, sessions: [name] })));
+  }
+
+  function ensureImportSession() {
+    if (!importSession || sessions.some((session) => session.name === importSession)) return false;
+    const men = importRows.filter((row) => /^(male|man)$/i.test(row.gender)).length;
+    const women = importRows.filter((row) => /^(female|woman)$/i.test(row.gender)).length;
+    addSession({
+      id: `import-session-${importSession.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${Date.now()}`,
+      name: importSession,
+      window: importSession,
+      deadline: "TBD",
+      men,
+      women,
+      notes: `Auto-created from participant import. ${importRows.length} imported participant${importRows.length === 1 ? "" : "s"}.`,
+    });
+    return true;
+  }
+
   function commitImport() {
+    const createdSession = ensureImportSession();
     const count = importParticipants(importRows, importSession);
     setImportRows([]);
     setImportHeaders([]);
-    setImportStatus(`Imported ${count} participants.`);
+    setDetectedSessionName("");
+    setImportStatus(`Imported ${count} participants into ${importSession}${createdSession ? " and created the session" : ""}.`);
   }
 
   function confirmClear() {
@@ -326,8 +357,13 @@ export default function AuditPage() {
           <div className="form-grid">
             <label>
               Import into session
-              <select value={importSession} onChange={(e) => setImportSession(e.target.value)}>
+              <select value={importSession} onChange={(e) => handleImportSessionChange(e.target.value)}>
                 {sessions.length === 0 && <option>Imported File</option>}
+                {importSession && !sessions.some((session) => session.name === importSession) && (
+                  <option value={importSession}>
+                    {importSession}{detectedSessionName === importSession ? " (detected)" : " (new)"}
+                  </option>
+                )}
                 {sessions.map((session) => (
                   <option key={session.id} value={session.name}>{session.name}</option>
                 ))}

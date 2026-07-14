@@ -221,7 +221,15 @@ Do not run this against production unless you have confirmed the selection in dr
 
 If participants are still visible in the organizer console after cleanup, they are likely old browser-side sample data. Pull the latest code, rebuild/restart the frontend, and reload the browser. If needed, clear browser storage for the frontend origin.
 
-## 7. Set Up A Chapter's Own Sessions
+## 7. In-App Imports And Browser-Side Sessions
+
+Open `Audit` and use `Data Management` for browser-side import workflows.
+
+The in-app importer accepts CSV and Excel `.xlsx` files. For LDC signup workbooks, it scans the workbook sheets and uses the populated `Form Responses` sheet when present. It maps the current LDC signup columns for name, email, phone, gender, age, location, interests, maximum dates, age range, previous dates, cannot-date names, vision, welcome email, orientation date, card, RSVP, and notes.
+
+The importer detects the session from a session column or from the file name, such as `Fall 2024`, `Spring 2025`, `DMV Spring 2026`, or `DMV Summer 2026`. The detected session appears in the `Import into session` dropdown. If that browser-side session does not already exist, clicking `Import Previewed Rows` creates it and assigns imported participants to it. Choose a different dropdown value before import if the detected session is not the intended one.
+
+## 8. Set Up A Chapter's Own Sessions
 
 Each chapter should create its own `program_sessions` records instead of reusing demo sessions.
 
@@ -265,7 +273,7 @@ Chapter setup checklist:
 6. Add participants through the backend/API or approved intake flow.
 7. Run match recommendation and curation workflows only after registrations are reviewed.
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 If `psql` cannot connect:
 
@@ -286,7 +294,7 @@ If the app still shows old dummy data after the PostgreSQL cleanup:
 - Sign out and back in.
 - Restart the frontend if it was running while you changed backend data.
 
-## 9. Handoff Checklist For Another Operator
+## 10. Handoff Checklist For Another Operator
 
 Give the operator:
 

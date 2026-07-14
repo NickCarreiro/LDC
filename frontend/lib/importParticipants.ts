@@ -28,6 +28,7 @@ export type ParsedImport = {
   rows: ImportParticipantRow[];
   rawRowCount: number;
   skippedRowCount: number;
+  detectedSessionName: string;
 };
 
 type SourceRow = Record<string, string>;
@@ -36,6 +37,8 @@ type MatchRule = {
   exclude?: string[];
   exact?: boolean;
 };
+
+const SEASONS = ["Spring", "Summer", "Fall", "Winter"];
 
 function normalizeHeader(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -72,6 +75,33 @@ function rowsFromMatrix(matrix: unknown[][]): { headers: string[]; rows: SourceR
     .filter((row) => Object.values(row).some(Boolean));
 
   return { headers, rows };
+}
+
+function detectSessionName(fileName: string, rows: SourceRow[]) {
+  const rowSession = rows
+    .map((row) => pick(row, [
+      { include: ["program session"] },
+      { include: ["session"], exact: true },
+      { include: ["sessions"], exact: true },
+    ]))
+    .find(Boolean);
+  if (rowSession) return rowSession;
+
+  const cleaned = fileName
+    .replace(/\.[^.]+$/, "")
+    .replace(/copy of/gi, "")
+    .replace(/responses/gi, "")
+    .replace(/sign up|signup|for nick|little dates club|little-dates-club/gi, " ")
+    .replace(/[-_()]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const seasonMatch = new RegExp(`\\b(${SEASONS.join("|")})\\b\\s*(20\\d{2})`, "i").exec(cleaned);
+  if (!seasonMatch) return "";
+
+  const prefix = /\bdmv\b/i.test(cleaned) ? "DMV " : "";
+  const season = SEASONS.find((value) => value.toLowerCase() === seasonMatch[1].toLowerCase()) ?? seasonMatch[1];
+  return `${prefix}${season} ${seasonMatch[2]}`.trim();
 }
 
 export function parseCsv(text: string): SourceRow[] {
@@ -386,11 +416,14 @@ export async function parseParticipantImportFile(file: File, fallbackSession: st
     throw new Error("Import accepts CSV or XLSX files.");
   }
 
-  const mappedRows = mapImportRows(parsed.rows, fallbackSession);
+  const detectedSessionName = detectSessionName(file.name, parsed.rows);
+  const effectiveSessionName = detectedSessionName || fallbackSession;
+  const mappedRows = mapImportRows(parsed.rows, effectiveSessionName);
   return {
     headers: parsed.headers,
     rows: mappedRows,
     rawRowCount: parsed.rows.length,
     skippedRowCount: parsed.rows.length - mappedRows.length,
+    detectedSessionName,
   };
 }

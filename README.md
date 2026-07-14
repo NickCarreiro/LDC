@@ -371,6 +371,8 @@ The clear buttons require typing `CLEAR` before they run.
 
 Import accepts `.csv` and `.xlsx` files. For LDC signup workbooks, the importer scans workbook sheets and uses the first populated `Form Responses` sheet when present. It recognizes the current LDC form columns such as first/last name, full name, email, phone, gender, age, location, interests, max dates, age range, previous dates, cannot-date names, vision, welcome email, orientation date, card, RSVP, and notes.
 
+The importer also detects the session from the workbook filename or a session column. Examples: `Fall 2024`, `Spring 2025`, `DMV Spring 2026`, and `DMV Summer 2026`. The detected session appears in the `Import into session` dropdown before import. If that session does not already exist in the browser-side console data, `Import Previewed Rows` creates it automatically and sets the imported participants to that session. If the detected session is wrong, choose a different session in the dropdown before clicking import.
+
 Database cleanup and browser-side cleanup are separate:
 
 - Use `./scripts/clear-dummy-data.sh` for PostgreSQL records.
