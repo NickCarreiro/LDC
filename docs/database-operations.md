@@ -9,7 +9,7 @@ The database stores participant contact details, pastoral notes, relationship hi
 The LDC stack has two persistence paths:
 
 - PostgreSQL stores backend records: participants, sessions, registrations, date history, match drafts, staff users, and audit logs.
-- The current frontend also uses browser storage for some organizer-console mock data. Clearing PostgreSQL demo records does not clear a browser's `localStorage` or `sessionStorage`.
+- The current frontend also uses browser storage for some organizer-console state. It starts empty by default, unless `NEXT_PUBLIC_LOAD_SAMPLE_DATA=true` is set for demos.
 
 Important local defaults:
 
@@ -208,6 +208,8 @@ Then delete all operational rows only after confirming the preview and making a 
 The script deletes dependent records in this order: match drafts, date history, registrations, vision statement versions, participants, then selected sessions.
 
 Do not run this against production unless you have confirmed the selection in dry-run output and have a backup.
+
+If participants are still visible in the organizer console after cleanup, they are likely old browser-side sample data. Pull the latest code, rebuild/restart the frontend, and reload the browser. If needed, clear browser storage for the frontend origin.
 
 ## 7. Set Up A Chapter's Own Sessions
 

@@ -17,7 +17,13 @@ import { DEFAULT_KEYWORDS, type KeywordWeight } from "./visionWeights";
 
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
-const SCHEMA_VERSION = "v8"; // bump when seed data shape changes to force a reset
+const SCHEMA_VERSION = "v9"; // bump when seed data shape changes to force a reset
+const LOAD_SAMPLE_DATA = process.env.NEXT_PUBLIC_LOAD_SAMPLE_DATA === "true";
+
+const initialParticipants = LOAD_SAMPLE_DATA ? seedParticipants : [];
+const initialSessions = LOAD_SAMPLE_DATA ? seedSessions : [];
+const initialMatchDrafts = LOAD_SAMPLE_DATA ? seedMatchDrafts : [];
+const initialAuditEvents = LOAD_SAMPLE_DATA ? seedAuditEvents : [];
 
 function load<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -100,16 +106,16 @@ const StoreCtx = createContext<Store | null>(null);
 export function DataProvider({ children }: { children: ReactNode }) {
   // Initialise from localStorage if available, fall back to seed data
   const [participants, setParticipants] = useState<Participant[]>(() =>
-    load("ldc_participants", seedParticipants)
+    load("ldc_participants", initialParticipants)
   );
   const [sessions, setSessions] = useState<Session[]>(() =>
-    load("ldc_sessions", seedSessions)
+    load("ldc_sessions", initialSessions)
   );
   const [matchDrafts, setMatchDrafts] = useState<MatchDraft[]>(() =>
-    load("ldc_matchDrafts", seedMatchDrafts)
+    load("ldc_matchDrafts", initialMatchDrafts)
   );
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>(() =>
-    load("ldc_auditEvents", seedAuditEvents)
+    load("ldc_auditEvents", initialAuditEvents)
   );
   const [keywords, setKeywords] = useState<KeywordWeight[]>(() =>
     load("ldc_keywords", DEFAULT_KEYWORDS)

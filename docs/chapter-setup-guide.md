@@ -163,6 +163,8 @@ If the preview looks right, run:
 
 This removes the sample people and synthetic test data that are only meant for demos.
 
+If the site still shows sample people after this, reload after pulling the latest version of the site. Older versions kept sample people in the browser. If they still appear, clear browser storage for the site and reload.
+
 If you want to keep the sample session names but remove sample people, run:
 
 ```bash

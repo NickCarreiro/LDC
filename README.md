@@ -61,7 +61,7 @@ Backend API areas:
 There are currently two data paths:
 
 - PostgreSQL stores backend records such as participants, sessions, registrations, date history, match drafts, staff users, and audit logs.
-- Some frontend console data still uses browser storage/local mock state. Clearing PostgreSQL demo data does not automatically clear browser `localStorage` or `sessionStorage`.
+- Some frontend console data still uses browser storage/local state. The console starts empty unless `NEXT_PUBLIC_LOAD_SAMPLE_DATA=true` is set.
 
 For a real chapter, treat all participant records, notes, relationship history, and backups as sensitive.
 
@@ -102,6 +102,12 @@ Frontend organizer login also expects these values when running the deployed/pro
 ```text
 ORGANIZER_PASS=replace-with-organizer-password
 SESSION_SECRET=replace-with-long-random-session-secret
+```
+
+The frontend console starts empty by default. To intentionally load the built-in browser-side sample participants and sessions for a demo, add:
+
+```text
+NEXT_PUBLIC_LOAD_SAMPLE_DATA=true
 ```
 
 Generate a secure session secret with:
@@ -259,6 +265,8 @@ Delete all operational rows after confirming the preview and making a backup:
 
 Always make a backup before destructive cleanup on a real database.
 
+If participants still appear in the browser after cleanup, pull the latest code and reload the site. This release bumps the frontend storage schema and clears older browser-side sample data. If needed, manually clear browser storage for `localhost:3000`.
+
 ## Chapter Session Setup
 
 Create or update a chapter session:
@@ -391,6 +399,7 @@ pgAdmin cannot connect:
 
 App still shows old sample records after PostgreSQL cleanup:
 
+- Pull the latest code and rebuild/restart the frontend.
 - Sign out and back in.
 - Clear browser storage for `localhost:3000`.
 - Restart the frontend.
