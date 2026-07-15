@@ -6,6 +6,7 @@ import {
   FileText,
   GitMerge,
   HeartHandshake,
+  KeyRound,
   LockKeyhole,
   Mail,
   UsersRound,
@@ -29,7 +30,8 @@ const navItems = [
   { href: "/matching", label: "Match Workbench", icon: HeartHandshake },
   { href: "/matches", label: "Curation Table", icon: GitMerge },
   { href: "/drafts", label: "Draft Emails", icon: Mail },
-  { href: "/audit", label: "Audit", icon: LockKeyhole }
+  { href: "/audit", label: "Audit", icon: LockKeyhole },
+  { href: "/account", label: "Account", icon: KeyRound }
 ];
 
 // sessionStorage is used only as a UI hint to avoid a flash of the login form
