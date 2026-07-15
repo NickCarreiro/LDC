@@ -101,8 +101,10 @@ echo "[startup] Both services running. Press Ctrl-C to stop."
 
 cleanup() {
   echo "[startup] Shutting down..."
-  kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
-  wait "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
+  if [ -n "${BACKEND_PID:-}" ]; then kill "$BACKEND_PID" 2>/dev/null || true; fi
+  if [ -n "${FRONTEND_PID:-}" ]; then kill "$FRONTEND_PID" 2>/dev/null || true; fi
+  if [ -n "${BACKEND_PID:-}" ]; then wait "$BACKEND_PID" 2>/dev/null || true; fi
+  if [ -n "${FRONTEND_PID:-}" ]; then wait "$FRONTEND_PID" 2>/dev/null || true; fi
   echo "[startup] Done."
 }
 trap cleanup EXIT INT TERM
