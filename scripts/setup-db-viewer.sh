@@ -7,6 +7,7 @@ ENV_FILE="${ENV_FILE:-$ROOT_DIR/.env}"
 PGADMIN_CONTAINER="${PGADMIN_CONTAINER:-ldc-pgadmin}"
 PGADMIN_IMAGE="${PGADMIN_IMAGE:-dpage/pgadmin4:latest}"
 PGADMIN_PORT="${PGADMIN_PORT:-5050}"
+PGADMIN_BIND="${PGADMIN_BIND:-127.0.0.1}"
 PGADMIN_EMAIL="${PGADMIN_EMAIL:-admin@ldc.local}"
 PGADMIN_PASSWORD="${PGADMIN_PASSWORD:-ldc_pgadmin_change_me}"
 PGADMIN_DATA_DIR="${PGADMIN_DATA_DIR:-$ROOT_DIR/.local/pgadmin}"
@@ -26,8 +27,14 @@ Defaults:
   pgAdmin login:    admin@ldc.local / ldc_pgadmin_change_me
   DB connection:    host.docker.internal:5432, db=ldc, user=ldc
 
+By default pgAdmin is bound to 127.0.0.1 only (not reachable from outside this
+host). Access it via an SSH tunnel, e.g.:
+  ssh -L 5050:localhost:5050 user@host
+Set PGADMIN_BIND=0.0.0.0 to expose it on all interfaces instead (only do this
+behind a firewall/security group that restricts who can reach the port).
+
 Override with environment variables:
-  PGADMIN_PORT=5051 PGADMIN_EMAIL=you@example.com PGADMIN_PASSWORD='strong-pass'
+  PGADMIN_PORT=5051 PGADMIN_BIND=0.0.0.0 PGADMIN_EMAIL=you@example.com PGADMIN_PASSWORD='strong-pass'
   DB_HOST=127.0.0.1 DB_PORT=5432 DB_NAME=ldc DB_USER=ldc DB_PASSWORD='...'
 
 Examples:
@@ -146,7 +153,7 @@ fi
 docker run -d \
   --name "$PGADMIN_CONTAINER" \
   --add-host=host.docker.internal:host-gateway \
-  -p "$PGADMIN_PORT:80" \
+  -p "$PGADMIN_BIND:$PGADMIN_PORT:80" \
   -e "PGADMIN_DEFAULT_EMAIL=$PGADMIN_EMAIL" \
   -e "PGADMIN_DEFAULT_PASSWORD=$PGADMIN_PASSWORD" \
   -e "PGADMIN_CONFIG_SERVER_MODE=False" \
