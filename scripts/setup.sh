@@ -83,6 +83,21 @@ if grep -q "REPLACE_WITH_32_BYTE_BASE64_KEY" .env; then
   echo "  Generated FIELD_ENCRYPTION_KEY"
 fi
 
+# Generate organizer login credentials if missing — .env.example doesn't
+# ship these (bootstrap.sh normally prompts for them interactively; this
+# script doesn't prompt, so it must generate them itself or the frontend
+# organizer login silently has no working password).
+if ! grep -q "^ORGANIZER_PASS=" .env; then
+  GENERATED_ORGANIZER_PASS="$(python3 -c 'import secrets; print(secrets.token_urlsafe(12))')"
+  echo "ORGANIZER_PASS=$GENERATED_ORGANIZER_PASS" >> .env
+  echo "  Generated ORGANIZER_PASS: $GENERATED_ORGANIZER_PASS"
+fi
+if ! grep -q "^SESSION_SECRET=" .env; then
+  SESSION_SECRET_VALUE="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
+  echo "SESSION_SECRET=$SESSION_SECRET_VALUE" >> .env
+  echo "  Generated SESSION_SECRET"
+fi
+
 # Patch DATABASE_URL to use local Postgres
 sed -i "s|POSTGRES_HOST_PORT=.*|POSTGRES_HOST_PORT=5432|" .env
 sed -i "s|DATABASE_URL=.*|DATABASE_URL=postgresql+psycopg://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME|" .env
