@@ -10,6 +10,8 @@ This README is the main usage guide for setting up and operating the site. For a
 
 For deeper database administration, use [docs/database-operations.md](docs/database-operations.md).
 
+For systemd/nginx production service management, venv recreation, and exact package inventories, use [docs/production-operations.md](docs/production-operations.md).
+
 ## Fastest Fresh Setup
 
 On a new machine, clone the repo and run the interactive bootstrap:
@@ -416,6 +418,23 @@ The deployed-style server setup uses:
 - Next.js frontend service on port `3001`.
 - FastAPI backend service on port `8000`.
 - PostgreSQL as persistent storage.
+
+For full service-restart commands, the backend venv/package inventory, and the frontend Node package inventory for this deployment style, see [docs/production-operations.md](docs/production-operations.md).
+
+Restart the app services:
+
+```bash
+sudo systemctl restart ldc-backend.service
+sudo systemctl restart ldc-frontend.service
+```
+
+Verify after restart:
+
+```bash
+curl -sS http://127.0.0.1:8000/health
+curl -sS http://127.0.0.1:3000/api/health
+sudo systemctl status ldc-backend.service ldc-frontend.service --no-pager
+```
 
 If the public site returns `502 Bad Gateway`, check:
 
