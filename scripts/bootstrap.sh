@@ -283,7 +283,8 @@ chmod 600 .env
 echo ""
 echo "[5/8] Installing backend dependencies..."
 cd "$ROOT_DIR/backend"
-if [ ! -d ".venv" ]; then
+if [ ! -x ".venv/bin/python3" ]; then
+  rm -rf .venv
   python3 -m venv .venv
 fi
 . "$ROOT_DIR/backend/.venv/bin/activate"

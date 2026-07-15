@@ -39,7 +39,8 @@ echo "[startup] ROOT_DIR=$ROOT_DIR  APP_ENV=$APP_ENV"
 echo "[startup] Installing backend dependencies..."
 cd "$ROOT_DIR/backend"
 
-if [ ! -d ".venv" ]; then
+if [ ! -x ".venv/bin/python3" ]; then
+  rm -rf .venv
   python3 -m venv .venv
 fi
 . "$ROOT_DIR/backend/.venv/bin/activate"
