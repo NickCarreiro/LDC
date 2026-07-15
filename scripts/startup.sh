@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# Re-exec under bash if invoked via sh/dash — ${BASH_SOURCE[0]} and other
+# bashisms below silently misbehave under POSIX sh instead of failing loudly.
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 # ── LDC startup script ────────────────────────────────────────────────────────
 # Runs both the Next.js frontend and FastAPI backend.
 # Designed for AWS deployment (EC2 / ECS / App Runner).
@@ -36,25 +42,16 @@ cd "$ROOT_DIR/backend"
 if [ ! -d ".venv" ]; then
   python3 -m venv .venv
 fi
-. .venv/bin/activate
+. "$ROOT_DIR/backend/.venv/bin/activate"
 pip install -e ".[dev]" --quiet
 
 echo "[startup] Running database migrations..."
-python -c "
-from app.db.init_db import init_db
-from app.db.session import engine
-init_db(engine)
-print('[startup] DB init complete')
-"
+python -m app.db.init_db
+echo "[startup] DB init complete"
 
 if [ "$APP_ENV" = "local" ]; then
   echo "[startup] Seeding local database..."
-  python -c "
-from app.db.seed import seed
-from app.db.session import SessionLocal
-with SessionLocal() as db:
-    seed(db)
-" || echo "[startup] Seed skipped (already seeded or error)"
+  python -m app.db.seed || echo "[startup] Seed skipped (already seeded or error)"
 fi
 
 echo "[startup] Starting FastAPI backend on port $BACKEND_PORT..."

@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# Re-exec under bash if invoked via sh/dash — ${BASH_SOURCE[0]} and other
+# bashisms below silently misbehave under POSIX sh instead of failing loudly.
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -12,7 +18,7 @@ trap 'kill 0' EXIT
 
 (
   cd backend
-  . .venv/bin/activate
+  . "$ROOT_DIR/backend/.venv/bin/activate"
   WATCHFILES_FORCE_POLLING=true uvicorn app.main:app --reload --reload-dir app --host 0.0.0.0 --port 8000
 ) &
 

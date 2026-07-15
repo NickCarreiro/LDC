@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# Re-exec under bash if invoked via sh/dash — ${BASH_SOURCE[0]} and other
+# bashisms below silently misbehave under POSIX sh instead of failing loudly.
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 # ── LDC setup + start ─────────────────────────────────────────────────────────
 # Run once (or any time) on the EC2 instance after cloning / pulling.
 # Installs all deps, creates the local Postgres DB, migrates, builds, and starts.
@@ -90,7 +96,7 @@ cd "$ROOT_DIR/backend"
 if [ ! -d ".venv" ]; then
   python3 -m venv .venv
 fi
-. .venv/bin/activate
+. "$ROOT_DIR/backend/.venv/bin/activate"
 pip install --upgrade pip --quiet
 pip install -e ".[dev]" --quiet
 echo "  Backend packages installed"
@@ -98,15 +104,8 @@ echo "  Backend packages installed"
 # ── 5. Database migration ─────────────────────────────────────────────────────
 echo "[5/7] Running database migrations..."
 
-python3 - <<'PY'
-import sys, os
-sys.path.insert(0, ".")
-os.chdir(os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else ".")
-from app.db.init_db import init_db
-from app.db.session import engine
-init_db(engine)
-print("  DB schema up to date")
-PY
+python -m app.db.init_db
+echo "  DB schema up to date"
 
 # ── 6. Frontend build ─────────────────────────────────────────────────────────
 echo "[6/7] Installing and building frontend..."
@@ -134,7 +133,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 cd "$ROOT_DIR/backend"
-. .venv/bin/activate
+. "$ROOT_DIR/backend/.venv/bin/activate"
 uvicorn app.main:app \
   --host 0.0.0.0 \
   --port "$BACKEND_PORT" \

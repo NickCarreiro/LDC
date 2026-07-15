@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# Re-exec under bash if invoked via sh/dash — ${BASH_SOURCE[0]} and other
+# bashisms below silently misbehave under POSIX sh instead of failing loudly.
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 # ── LDC production provisioning ────────────────────────────────────────────
 # Installs nginx and registers the LDC systemd services from the tracked
 # configs under infra/systemd/ and infra/nginx/. This is the counterpart to
