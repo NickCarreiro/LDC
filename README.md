@@ -44,6 +44,7 @@ The repo is split into:
 - `scripts/`: setup, development, database cleanup, viewer setup, and session utilities.
 - `docs/`: operator guides, database guide, product notes, and audits.
 - `infra/keycloak/`: local Keycloak realm scaffold.
+- `infra/systemd/`, `infra/nginx/`: tracked source for the production `nginx` + `systemd` deployment, installed by `scripts/provision-production.sh`.
 
 Main local URLs:
 
@@ -630,6 +631,7 @@ All commands below are run from the repo root.
 | `./scripts/create-session.sh` | Creates or updates a chapter session. | New chapter/session setup. |
 | `./scripts/setup-db-viewer.sh` | Starts pgAdmin in Docker and preloads an LDC database connection. | Give an operator a browser-based database viewer. |
 | `./scripts/build-operator-guide.py` | Regenerates the printable PDF/ODT setup guide from Markdown. | After editing `docs/chapter-setup-guide.md`. |
+| `./scripts/provision-production.sh` | Installs nginx and registers the `ldc-backend`/`ldc-frontend` systemd units from `infra/systemd/` and `infra/nginx/`. | Turning a fresh host (already run through `setup.sh`/`bootstrap.sh`) into the production topology. See [docs/production-operations.md](docs/production-operations.md). |
 
 Common script commands:
 

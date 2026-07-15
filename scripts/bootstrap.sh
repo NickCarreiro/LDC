@@ -310,6 +310,13 @@ fi
 echo ""
 echo "Setup complete."
 echo ""
+if [ "$APP_ENV" = "production" ]; then
+  echo "APP_ENV is production. To install nginx and register the ldc-backend/"
+  echo "ldc-frontend systemd services, run:"
+  echo "  ./scripts/provision-production.sh"
+  echo "See docs/production-operations.md for details."
+  echo ""
+fi
 echo "Start the app with:"
 echo "  ./scripts/startup.sh"
 echo ""

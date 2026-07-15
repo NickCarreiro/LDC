@@ -1,0 +1,33 @@
+[Unit]
+Description=LDC Operations Frontend (Next.js)
+After=network.target
+# Restart at most 5 times in 5 minutes before giving up; prevents crash-loop burn
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/LDC/frontend
+EnvironmentFile=/home/ubuntu/LDC/.env
+Environment=NEXT_TELEMETRY_DISABLED=1
+Environment=PORT=3001
+# Cap V8 heap to 400 MB — keeps GC aggressive and leaves headroom for OS + nginx on 2 GB RAM
+Environment=NODE_OPTIONS=--max-old-space-size=400
+ExecStartPre=/usr/bin/npm run build
+ExecStart=/usr/bin/node node_modules/.bin/next start --port 3001
+Restart=on-failure
+RestartSec=5
+# Hard memory ceiling — OOM-kills only this process, not others
+MemoryMax=600M
+# Soft warning threshold — triggers kernel reclaim before hitting the hard ceiling
+MemoryHigh=500M
+# Kill only this unit if OOM; do not cascade to other processes
+OOMPolicy=stop
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ldc-frontend
+
+[Install]
+WantedBy=multi-user.target

@@ -19,7 +19,31 @@ nginx (`/etc/nginx/sites-enabled/ldc`) proxies almost everything to the Next.js 
 
 Host observed: Ubuntu 26.04, Python 3.14.4, Node v20.20.2 / npm 10.8.2.
 
-## 2. Service Management
+The nginx rate-limit zones, proxy microcache path, and the `ldc_app` upstream definition live in the `http {}` block of `/etc/nginx/nginx.conf` on this host (via `limit_req_zone`, `limit_conn_zone`, `proxy_cache_path`, `upstream ldc_app`). They are captured for reuse in `infra/nginx/ldc-upstream.conf`, meant to be dropped into `/etc/nginx/conf.d/` on a fresh host rather than hand-edited into `nginx.conf` again.
+
+## 2. Fresh-Host Provisioning
+
+Nothing above exists by default on a new machine — `nginx` is not installed by `scripts/setup.sh`/`bootstrap.sh`, and the two systemd units and nginx site config are not created by any script. They are now tracked under `infra/`:
+
+- `infra/systemd/ldc-backend.service`
+- `infra/systemd/ldc-frontend.service`
+- `infra/nginx/ldc-upstream.conf` (rate-limit zones, cache path, upstream)
+- `infra/nginx/ldc-site.conf` (the `:3000` server block)
+
+To go from a bare host to the full production topology:
+
+```bash
+./scripts/bootstrap.sh           # or setup.sh — installs Python/Node/Postgres,
+                                  # creates backend/.venv, builds the frontend
+./scripts/provision-production.sh   # installs nginx, registers systemd units,
+                                     # starts ldc-backend + ldc-frontend
+```
+
+`provision-production.sh` installs `nginx` via `apt-get` if missing, copies the `infra/nginx/*` and `infra/systemd/*` files into place (backing up any existing file that differs, as `<file>.bak.<timestamp>`), runs `nginx -t`, reloads nginx, `daemon-reload`s systemd, enables both units, and starts them.
+
+The systemd unit files assume the repo lives at `/home/ubuntu/LDC` and runs as user `ubuntu` — edit `infra/systemd/*.service` first if your host differs, then re-run the script.
+
+## 3. Service Management
 
 Check status:
 
@@ -60,7 +84,7 @@ journalctl -u ldc-frontend -n 80 --no-pager
 
 Both units have `Restart=` policies (`always` for backend, `on-failure` for frontend with a 5-in-300s start limit), so a crashed process is expected to self-recover; check `journalctl` if a service is flapping.
 
-## 3. Post-Restart Verification
+## 4. Post-Restart Verification
 
 Run these after any restart:
 
@@ -73,7 +97,7 @@ sudo systemctl is-active postgresql ldc-backend.service ldc-frontend.service
 
 All three should report `active`, and both health endpoints should return `200`.
 
-## 4. Backend Python Environment
+## 5. Backend Python Environment
 
 - Location: `backend/.venv`
 - Python: 3.14.4 (created with `python3 -m venv .venv`; the project only requires `>=3.11`, so any modern `python3` works)
@@ -137,7 +161,7 @@ pytest -q           # should pass
 python -m app.db.init_db   # apply/verify schema against DATABASE_URL
 ```
 
-## 5. Frontend Node Environment
+## 6. Frontend Node Environment
 
 - Node: v20.20.2, npm: 10.8.2 (repo requires Node 20+)
 - Dependencies declared in `frontend/package.json`, locked in `frontend/package-lock.json`.
@@ -166,7 +190,7 @@ Dev dependencies:
 
 `ldc-frontend.service` sets `NODE_OPTIONS=--max-old-space-size=400`, `MemoryMax=600M`, `MemoryHigh=500M` — this is a memory-constrained host (2 GB class instance). If the frontend OOM-kills during a heavy build, that ceiling is the first thing to check (`journalctl -u ldc-frontend | grep -i oom`).
 
-## 6. Full Restart Runbook (last verified 2026-07-15)
+## 7. Full Restart Runbook (last verified 2026-07-15)
 
 ```bash
 sudo systemctl restart postgresql
@@ -183,7 +207,7 @@ sudo systemctl status ldc-backend.service ldc-frontend.service --no-pager
 
 Result of the last run: both services came back `active (running)` within ~40s, `/health` and `/api/health` both returned success, `ruff check .` reported no issues, and `pytest -q` passed (2 passed). No dependency or configuration fixes were needed — the venv, `node_modules`, and systemd units were already in a correct state.
 
-## 7. Related Docs
+## 8. Related Docs
 
 - [README.md](../README.md) — general setup, scripts reference, domain/DNS setup.
 - [docs/database-operations.md](database-operations.md) — Postgres schema, backups, session/data management.
